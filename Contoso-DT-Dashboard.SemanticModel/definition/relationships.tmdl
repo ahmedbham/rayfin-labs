@@ -1,0 +1,7 @@
+relationship Metrics_Date
+	fromColumn: Metrics.DateKey
+	toColumn: Date.DateKey
+
+relationship AIDetections_Date
+	fromColumn: AIDetections.DateKey
+	toColumn: Date.DateKey

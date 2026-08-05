@@ -1,0 +1,110 @@
+table AIDetections
+
+	/// Total anomalies/exceptions detected by AI
+	measure 'Total Detections' = SUM(AIDetections[DetectionCount])
+		formatString: #,##0
+
+	/// Claims AI detections (year to date)
+	measure 'Claims AI YTD' = CALCULATE(SUM(AIDetections[DetectionCount]), AIDetections[SystemName] = "Claims AI")
+		formatString: #,##0
+
+	/// Provider AI detections (year to date)
+	measure 'Provider AI YTD' = CALCULATE(SUM(AIDetections[DetectionCount]), AIDetections[SystemName] = "Provider AI")
+		formatString: #,##0
+
+	measure 'Claims AI Critical' = CALCULATE(SUM(AIDetections[DetectionCount]), AIDetections[SystemName] = "Claims AI", AIDetections[Severity] = "Critical")
+		formatString: #,##0
+
+	measure 'Claims AI High' = CALCULATE(SUM(AIDetections[DetectionCount]), AIDetections[SystemName] = "Claims AI", AIDetections[Severity] = "High")
+		formatString: #,##0
+
+	measure 'Provider AI Critical' = CALCULATE(SUM(AIDetections[DetectionCount]), AIDetections[SystemName] = "Provider AI", AIDetections[Severity] = "Critical")
+		formatString: #,##0
+
+	measure 'Provider AI High' = CALCULATE(SUM(AIDetections[DetectionCount]), AIDetections[SystemName] = "Provider AI", AIDetections[Severity] = "High")
+		formatString: #,##0
+
+	column DateKey
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: DateKey
+
+	column SystemName
+		dataType: string
+		summarizeBy: none
+		sourceColumn: SystemName
+
+	column Severity
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Severity
+
+	column DetectionCount
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: DetectionCount
+
+	partition AIDetections = m
+		mode: import
+		source = ```
+			// Synthetic AI-detected anomalies by system and severity
+			let Source = #table(
+			type table [DateKey = Int64.Type, SystemName = text, Severity = text, DetectionCount = Int64.Type],
+			{
+				{202412, "Claims AI", "Critical", 74},
+				{202412, "Claims AI", "High", 923},
+				{202412, "Provider AI", "Critical", 11},
+				{202412, "Provider AI", "High", 73},
+				{202501, "Claims AI", "Critical", 68},
+				{202501, "Claims AI", "High", 917},
+				{202501, "Provider AI", "Critical", 10},
+				{202501, "Provider AI", "High", 81},
+				{202502, "Claims AI", "Critical", 77},
+				{202502, "Claims AI", "High", 972},
+				{202502, "Provider AI", "Critical", 12},
+				{202502, "Provider AI", "High", 100},
+				{202503, "Claims AI", "Critical", 89},
+				{202503, "Claims AI", "High", 1040},
+				{202503, "Provider AI", "Critical", 12},
+				{202503, "Provider AI", "High", 95},
+				{202504, "Claims AI", "Critical", 86},
+				{202504, "Claims AI", "High", 1116},
+				{202504, "Provider AI", "Critical", 17},
+				{202504, "Provider AI", "High", 96},
+				{202505, "Claims AI", "Critical", 94},
+				{202505, "Claims AI", "High", 1155},
+				{202505, "Provider AI", "Critical", 16},
+				{202505, "Provider AI", "High", 116},
+				{202506, "Claims AI", "Critical", 105},
+				{202506, "Claims AI", "High", 1148},
+				{202506, "Provider AI", "Critical", 17},
+				{202506, "Provider AI", "High", 118},
+				{202507, "Claims AI", "Critical", 100},
+				{202507, "Claims AI", "High", 1243},
+				{202507, "Provider AI", "Critical", 19},
+				{202507, "Provider AI", "High", 116},
+				{202508, "Claims AI", "Critical", 109},
+				{202508, "Claims AI", "High", 1290},
+				{202508, "Provider AI", "Critical", 24},
+				{202508, "Provider AI", "High", 136},
+				{202509, "Claims AI", "Critical", 121},
+				{202509, "Claims AI", "High", 1319},
+				{202509, "Provider AI", "Critical", 23},
+				{202509, "Provider AI", "High", 134},
+				{202510, "Claims AI", "Critical", 126},
+				{202510, "Claims AI", "High", 1445},
+				{202510, "Provider AI", "Critical", 22},
+				{202510, "Provider AI", "High", 131},
+				{202511, "Claims AI", "Critical", 124},
+				{202511, "Claims AI", "High", 1498},
+				{202511, "Provider AI", "Critical", 26},
+				{202511, "Provider AI", "High", 136},
+				{202512, "Claims AI", "Critical", 134},
+				{202512, "Claims AI", "High", 1543},
+				{202512, "Provider AI", "Critical", 28},
+				{202512, "Provider AI", "High", 144}
+			}
+		)
+			in Source
+			```

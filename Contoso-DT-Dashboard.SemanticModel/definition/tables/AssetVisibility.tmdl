@@ -1,0 +1,48 @@
+table AssetVisibility
+
+	/// Overall technology asset visibility coverage %
+	measure 'Asset Visibility %' = DIVIDE(SUM(AssetVisibility[CoveredAssets]), SUM(AssetVisibility[TotalAssets]))
+		formatString: 0.0%
+
+	column Severity
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Severity
+		sortByColumn: SortOrder
+
+	column VisibilityPct
+		dataType: double
+		summarizeBy: average
+		sourceColumn: VisibilityPct
+
+	column SortOrder
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: SortOrder
+
+	column CoveredAssets
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: CoveredAssets
+
+	column TotalAssets
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: TotalAssets
+
+	partition AssetVisibility = m
+		mode: import
+		source = ```
+			// Technology asset visibility snapshot by criticality
+			let Source = #table(
+			type table [Severity = text, VisibilityPct = number, SortOrder = Int64.Type, CoveredAssets = Int64.Type, TotalAssets = Int64.Type],
+			{
+				{"Critical", 99.2, 4, 1240, 1250},
+				{"High", 97.8, 3, 5380, 5500},
+				{"Medium", 94.1, 2, 11760, 12500},
+				{"Low", 88.5, 1, 15930, 18000}
+			}
+		)
+			in Source
+			```

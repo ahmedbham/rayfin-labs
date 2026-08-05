@@ -1,0 +1,38 @@
+title: Build Fabric Apps with Rayfin
+description: Hands-on labs for building Microsoft Fabric Apps with Rayfin CLI and GitHub Copilot.
+url: https://ahmedbham.github.io
+baseurl: /rayfin-labs
+repository: ahmedbham/rayfin-labs
+
+theme: just-the-docs
+color_scheme: rayfin
+search_enabled: true
+heading_anchors: true
+
+aux_links:
+  View on GitHub: https://github.com/ahmedbham/rayfin-labs
+aux_links_new_tab: true
+
+callouts:
+  checkpoint:
+    title: Checkpoint
+    color: green
+  important:
+    title: Important
+    color: yellow
+  note:
+    title: Note
+    color: blue
+  warning:
+    title: Warning
+    color: red
+
+footer_content: >-
+  Microsoft Fabric Apps and Rayfin local development are preview experiences.
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - requirements.md
+  - node_modules
+  - vendor

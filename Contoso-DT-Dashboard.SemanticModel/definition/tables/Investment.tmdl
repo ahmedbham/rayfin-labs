@@ -1,0 +1,52 @@
+table Investment
+
+	/// Total 2025 D&T investment (USD)
+	measure 'Total Investment' = SUM(Investment[Amount])
+		formatString: \$#,##0,,\M
+
+	column BusinessUnit
+		dataType: string
+		summarizeBy: none
+		sourceColumn: BusinessUnit
+
+	column StrategicTheme
+		dataType: string
+		summarizeBy: none
+		sourceColumn: StrategicTheme
+
+	column Amount
+		dataType: double
+		summarizeBy: sum
+		sourceColumn: Amount
+
+	partition Investment = m
+		mode: import
+		source = ```
+			// 2025 D&T investment by business unit and strategic theme
+			let Source = #table(
+			type table [BusinessUnit = text, StrategicTheme = text, Amount = number],
+			{
+				{"Enterprise Technology", "Resiliency", 44600000.0},
+				{"Enterprise Technology", "Member Experience", 17300000.0},
+				{"Enterprise Technology", "Compliance & Security", 7200000.0},
+				{"Enterprise Technology", "Growth", 2900000.0},
+				{"Claims & Operations", "Resiliency", 22300000.0},
+				{"Claims & Operations", "Member Experience", 8600000.0},
+				{"Claims & Operations", "Compliance & Security", 3600000.0},
+				{"Claims & Operations", "Growth", 1500000.0},
+				{"Finance", "Resiliency", 19200000.0},
+				{"Finance", "Member Experience", 7400000.0},
+				{"Finance", "Compliance & Security", 3100000.0},
+				{"Finance", "Growth", 1300000.0},
+				{"Provider & Network", "Resiliency", 7400000.0},
+				{"Provider & Network", "Member Experience", 2900000.0},
+				{"Provider & Network", "Compliance & Security", 1200000.0},
+				{"Provider & Network", "Growth", 500000.0},
+				{"Member Services", "Resiliency", 3100000.0},
+				{"Member Services", "Member Experience", 1200000.0},
+				{"Member Services", "Compliance & Security", 500000.0},
+				{"Member Services", "Growth", 200000.0}
+			}
+		)
+			in Source
+			```

@@ -1,0 +1,14 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-US
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+ref table Date
+ref table Metrics
+ref table Investment
+ref table AIDetections
+ref table AssetVisibility
+ref table Initiatives

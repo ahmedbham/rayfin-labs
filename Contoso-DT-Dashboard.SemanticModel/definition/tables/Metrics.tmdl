@@ -1,0 +1,278 @@
+table Metrics
+	measure 'ChangeSuccessRate (Latest)' = ```
+			VAR _m = CALCULATE(MAX('Date'[DateKey]), ALL('Date'))
+			RETURN CALCULATE(AVERAGE(Metrics[ChangeSuccessRate]), 'Date'[DateKey] = _m)
+			```
+		formatString: 0.0
+	measure 'BitSightScore (Latest)' = ```
+			VAR _m = CALCULATE(MAX('Date'[DateKey]), ALL('Date'))
+			RETURN CALCULATE(AVERAGE(Metrics[BitSightScore]), 'Date'[DateKey] = _m)
+			```
+		formatString: #,##0
+	measure 'TenableScore (Latest)' = ```
+			VAR _m = CALCULATE(MAX('Date'[DateKey]), ALL('Date'))
+			RETURN CALCULATE(AVERAGE(Metrics[TenableScore]), 'Date'[DateKey] = _m)
+			```
+		formatString: #,##0
+	measure 'CyberExposureScore (Latest)' = ```
+			VAR _m = CALCULATE(MAX('Date'[DateKey]), ALL('Date'))
+			RETURN CALCULATE(AVERAGE(Metrics[CyberExposureScore]), 'Date'[DateKey] = _m)
+			```
+		formatString: #,##0
+	measure 'ZeroDayMTTR (Latest)' = ```
+			VAR _m = CALCULATE(MAX('Date'[DateKey]), ALL('Date'))
+			RETURN CALCULATE(AVERAGE(Metrics[ZeroDayMTTR]), 'Date'[DateKey] = _m)
+			```
+		formatString: 0.0
+	measure 'PhishingPassRate (Latest)' = ```
+			VAR _m = CALCULATE(MAX('Date'[DateKey]), ALL('Date'))
+			RETURN CALCULATE(AVERAGE(Metrics[PhishingPassRate]), 'Date'[DateKey] = _m)
+			```
+		formatString: 0.0
+	measure 'ComplianceTraining (Latest)' = ```
+			VAR _m = CALCULATE(MAX('Date'[DateKey]), ALL('Date'))
+			RETURN CALCULATE(AVERAGE(Metrics[ComplianceTraining]), 'Date'[DateKey] = _m)
+			```
+		formatString: 0.0
+	measure 'CSAT (Latest)' = ```
+			VAR _m = CALCULATE(MAX('Date'[DateKey]), ALL('Date'))
+			RETURN CALCULATE(AVERAGE(Metrics[CSAT]), 'Date'[DateKey] = _m)
+			```
+		formatString: 0.0
+	measure 'FCR (Latest)' = ```
+			VAR _m = CALCULATE(MAX('Date'[DateKey]), ALL('Date'))
+			RETURN CALCULATE(AVERAGE(Metrics[FCR]), 'Date'[DateKey] = _m)
+			```
+		formatString: 0.0
+	measure 'AISolutions (Latest)' = ```
+			VAR _m = CALCULATE(MAX('Date'[DateKey]), ALL('Date'))
+			RETURN CALCULATE(AVERAGE(Metrics[AISolutions]), 'Date'[DateKey] = _m)
+			```
+		formatString: #,##0
+	measure 'MTTR_P1 (Latest)' = ```
+			VAR _m = CALCULATE(MAX('Date'[DateKey]), ALL('Date'))
+			RETURN CALCULATE(AVERAGE(Metrics[MTTR_P1]), 'Date'[DateKey] = _m)
+			```
+		formatString: 0.0
+	measure 'MTTR_P2 (Latest)' = ```
+			VAR _m = CALCULATE(MAX('Date'[DateKey]), ALL('Date'))
+			RETURN CALCULATE(AVERAGE(Metrics[MTTR_P2]), 'Date'[DateKey] = _m)
+			```
+		formatString: 0.0
+	/// Availability % for Critical systems (latest month) shown as percentage
+	measure 'Availability Critical %' = ```
+			VAR _m = CALCULATE(MAX('Date'[DateKey]), ALL('Date'))
+			RETURN CALCULATE(AVERAGE(Metrics[AvailabilityCritical]), 'Date'[DateKey] = _m) / 100
+			```
+		formatString: 0.000%
+
+	/// Availability % for High systems (latest month) shown as percentage
+	measure 'Availability High %' = ```
+			VAR _m = CALCULATE(MAX('Date'[DateKey]), ALL('Date'))
+			RETURN CALCULATE(AVERAGE(Metrics[AvailabilityHigh]), 'Date'[DateKey] = _m) / 100
+			```
+		formatString: 0.0000%
+
+	/// Average Handling Time (latest month) formatted as mm:ss
+	measure 'Avg Handling Time' = ```
+			VAR _m = CALCULATE(MAX('Date'[DateKey]), ALL('Date'))
+			VAR _s = CALCULATE(AVERAGE(Metrics[AHTSeconds]), 'Date'[DateKey] = _m)
+			RETURN FORMAT(INT(_s/60), "00") & ":" & FORMAT(MOD(_s,60), "00")
+			```
+		formatString: 0
+
+	/// Total end-user technology incidents opened in the latest month
+	measure 'End User Incidents (Latest)' = ```
+			VAR _m = CALCULATE(MAX('Date'[DateKey]), ALL('Date'))
+			RETURN CALCULATE(SUM(Metrics[EndUserIncidents]), 'Date'[DateKey] = _m)
+			```
+		formatString: #,##0
+
+	/// Change volume (count of changes) in the latest month
+	measure 'Change Volume (Latest)' = ```
+			VAR _m = CALCULATE(MAX('Date'[DateKey]), ALL('Date'))
+			RETURN CALCULATE(SUM(Metrics[ChangeVolume]), 'Date'[DateKey] = _m)
+			```
+		formatString: #,##0
+
+	/// Incident frequency in the latest month
+	measure 'Incident Frequency (Latest)' = ```
+			VAR _m = CALCULATE(MAX('Date'[DateKey]), ALL('Date'))
+			RETURN CALCULATE(SUM(Metrics[IncidentFrequency]), 'Date'[DateKey] = _m)
+			```
+		formatString: #,##0
+
+	/// Trend measures for line charts (one row per month)
+	measure 'Avg MTTR P1' = AVERAGE(Metrics[MTTR_P1])
+		formatString: 0.0
+
+	measure 'Avg MTTR P2' = AVERAGE(Metrics[MTTR_P2])
+		formatString: 0.0
+
+	measure 'Change Success Rate' = AVERAGE(Metrics[ChangeSuccessRate])
+		formatString: 0.0
+
+	measure 'Cyber Exposure Score' = AVERAGE(Metrics[CyberExposureScore])
+		formatString: #,##0
+
+	measure 'End User Incidents' = SUM(Metrics[EndUserIncidents])
+		formatString: #,##0
+
+	measure 'Service Disruptions' = SUM(Metrics[ServiceDisruptions])
+		formatString: #,##0
+
+	measure 'Disruption Hours' = SUM(Metrics[DisruptionHours])
+		formatString: #,##0.0
+
+	measure 'Incident Count' = SUM(Metrics[IncidentFrequency])
+		formatString: #,##0
+
+	/// Gauge bounds and target for BitSight security rating
+	measure 'BitSight Min' = 250
+		formatString: #,##0
+
+	measure 'BitSight Max' = 900
+		formatString: #,##0
+
+	measure 'BitSight Target' = 700
+		formatString: #,##0
+
+	/// TSA reportable cybersecurity incidents (latest month)
+	measure 'TSA Reportable Incidents' = 0
+		formatString: #,##0
+
+	/// Critical cybersecurity incidents (latest month)
+	measure 'Critical Cyber Incidents' = 0
+		formatString: #,##0
+
+
+	column DateKey
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: DateKey
+
+	column AvailabilityCritical
+		dataType: double
+		summarizeBy: average
+		sourceColumn: AvailabilityCritical
+
+	column AvailabilityHigh
+		dataType: double
+		summarizeBy: average
+		sourceColumn: AvailabilityHigh
+
+	column MTTR_P1
+		dataType: double
+		summarizeBy: average
+		sourceColumn: MTTR_P1
+
+	column MTTR_P2
+		dataType: double
+		summarizeBy: average
+		sourceColumn: MTTR_P2
+
+	column IncidentFrequency
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: IncidentFrequency
+
+	column ChangeSuccessRate
+		dataType: double
+		summarizeBy: average
+		sourceColumn: ChangeSuccessRate
+
+	column ChangeVolume
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: ChangeVolume
+
+	column CyberExposureScore
+		dataType: double
+		summarizeBy: average
+		sourceColumn: CyberExposureScore
+
+	column BitSightScore
+		dataType: int64
+		summarizeBy: average
+		sourceColumn: BitSightScore
+
+	column TenableScore
+		dataType: int64
+		summarizeBy: average
+		sourceColumn: TenableScore
+
+	column ZeroDayMTTR
+		dataType: double
+		summarizeBy: average
+		sourceColumn: ZeroDayMTTR
+
+	column PhishingPassRate
+		dataType: double
+		summarizeBy: average
+		sourceColumn: PhishingPassRate
+
+	column ComplianceTraining
+		dataType: double
+		summarizeBy: average
+		sourceColumn: ComplianceTraining
+
+	column CSAT
+		dataType: double
+		summarizeBy: average
+		sourceColumn: CSAT
+
+	column AHTSeconds
+		dataType: int64
+		summarizeBy: average
+		sourceColumn: AHTSeconds
+
+	column FCR
+		dataType: double
+		summarizeBy: average
+		sourceColumn: FCR
+
+	column EndUserIncidents
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: EndUserIncidents
+
+	column ServiceDisruptions
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: ServiceDisruptions
+
+	column DisruptionHours
+		dataType: double
+		summarizeBy: sum
+		sourceColumn: DisruptionHours
+
+	column AISolutions
+		dataType: int64
+		summarizeBy: max
+		sourceColumn: AISolutions
+
+	partition Metrics = m
+		mode: import
+		source = ```
+			// Synthetic monthly D&T performance metrics
+			let Source = #table(
+			type table [DateKey = Int64.Type, AvailabilityCritical = number, AvailabilityHigh = number, MTTR_P1 = number, MTTR_P2 = number, IncidentFrequency = Int64.Type, ChangeSuccessRate = number, ChangeVolume = Int64.Type, CyberExposureScore = number, BitSightScore = Int64.Type, TenableScore = Int64.Type, ZeroDayMTTR = number, PhishingPassRate = number, ComplianceTraining = number, CSAT = number, AHTSeconds = Int64.Type, FCR = number, EndUserIncidents = Int64.Type, ServiceDisruptions = Int64.Type, DisruptionHours = number, AISolutions = Int64.Type],
+			{
+				{202412, 99.99612, 99.9763, 3.49, 7.28, 59, 95.98, 1211, 455.0, 598, 348, 3.2, 97.4, 92.5, 82.4, 564, 96.0, 2210, 9, 14.7, 274},
+				{202501, 99.99907, 99.98079, 3.3, 6.98, 59, 96.1, 1224, 469.0, 607, 366, 3.2, 97.6, 93.8, 83.7, 563, 96.3, 2231, 7, 12.6, 288},
+				{202502, 99.99692, 99.98188, 3.34, 6.87, 52, 96.64, 1231, 456.0, 606, 355, 2.9, 97.7, 94.4, 84.2, 546, 96.6, 2204, 8, 11.8, 296},
+				{202503, 99.99926, 99.98203, 3.38, 6.82, 56, 96.36, 1221, 433.0, 621, 339, 3.1, 98.3, 94.0, 83.8, 552, 96.7, 2052, 6, 10.7, 315},
+				{202504, 100.0, 99.98535, 3.44, 6.99, 47, 96.82, 1274, 435.0, 622, 343, 2.6, 98.1, 94.4, 85.7, 541, 96.7, 2063, 6, 11.8, 329},
+				{202505, 99.99918, 99.98622, 3.24, 6.52, 46, 96.62, 1241, 440.0, 640, 342, 2.6, 98.0, 95.3, 86.2, 510, 97.1, 1956, 7, 10.7, 331},
+				{202506, 99.99689, 99.98304, 3.02, 6.48, 46, 96.81, 1339, 420.0, 638, 330, 2.4, 98.3, 95.0, 85.9, 506, 97.1, 1909, 6, 8.6, 352},
+				{202507, 99.99563, 99.98284, 3.12, 6.16, 46, 97.48, 1344, 395.0, 638, 323, 2.4, 98.7, 95.8, 86.6, 522, 97.2, 1909, 5, 9.3, 355},
+				{202508, 99.99633, 99.99308, 2.77, 6.19, 45, 96.95, 1379, 409.0, 662, 330, 2.5, 98.6, 95.8, 86.1, 497, 97.4, 1859, 6, 7.1, 373},
+				{202509, 99.9992, 99.99137, 2.53, 5.54, 47, 97.68, 1363, 396.0, 651, 317, 2.2, 99.3, 95.8, 88.0, 479, 97.7, 1843, 5, 6.2, 376},
+				{202510, 99.99852, 99.9905, 2.61, 5.85, 39, 98.02, 1359, 375.0, 670, 305, 2.0, 99.4, 96.0, 87.5, 499, 98.6, 1723, 3, 5.5, 397},
+				{202511, 100.0, 99.99269, 2.56, 5.69, 41, 97.51, 1425, 362.0, 676, 315, 1.7, 99.1, 96.4, 88.1, 470, 98.5, 1767, 2, 5.6, 400},
+				{202512, 99.99939, 99.98832, 2.15, 5.32, 40, 97.96, 1439, 362.0, 678, 288, 1.5, 99.9, 97.7, 88.6, 480, 98.7, 1640, 1, 4.0, 419}
+			}
+		)
+			in Source
+			```
