@@ -6,9 +6,9 @@ The published workshop uses Jekyll and the Just the Docs theme. Its three labs c
 
 ## Source artifacts
 
-- `LAB_2_PROMPT.md` and `LAB_2_FUNCTIONAL_REQUIREMENTS.md` drive the Lab 2 Copilot workflow.
-- `LAB_3_PROMPT.md` drives the Lab 3 Copilot workflow.
-- `Contoso-DT-Dashboard.SemanticModel/` contains the Lab 3 TMDL semantic model.
+- `LAB_2_PROMPT.md` drives the Lab 2 Copilot workflow.
+- `Contoso-DT-Dashboard.SemanticModel/` contains the Lab 2 TMDL semantic model.
+- `LAB_3_PROMPT.md` and `LAB_3_FUNCTIONAL_REQUIREMENTS.md` drive the Lab 3 Copilot workflow.
 - `scripts/deploy_semantic_model.py` packages and deploys that model through the Fabric REST API.
 
 ## Preview the documentation

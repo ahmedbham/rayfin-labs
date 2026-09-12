@@ -19,11 +19,11 @@ Fabric Apps is a preview workload and is not available in every region.
 | GitHub Codespaces | Recommended | Recommended | Recommended |
 | VS Code and GitHub Copilot Chat | Required | Required | Required |
 | Git and Node.js 22 | Required | Required | Required |
-| Docker Desktop | Required for local Rayfin | Required for local Rayfin | Not required by the analytics template |
-| Capacity-backed Fabric workspace | Required for deployment | Required for deployment | Required |
-| Azure CLI | Recommended | Recommended | Required |
-| Python 3.11 or later | No | No | Required for model deployment |
-| Playwright CLI | No | Recommended | Required |
+| Docker Desktop | Required for local Rayfin | Not required by the analytics template | Required for local Rayfin |
+| Capacity-backed Fabric workspace | Required for deployment | Required | Required for deployment |
+| Azure CLI | Recommended | Required | Recommended |
+| Python 3.11 or later | No | Required for model deployment | No |
+| Playwright CLI | No | Required | Recommended |
 
 When using GitHub Codespaces, only Azure CLI is required from the developer tools listed in this matrix. The remaining developer tool requirements apply to local development.
 
@@ -48,7 +48,7 @@ Install the following software (if not using GH Codespaces):
 - [Node.js 22 LTS](https://nodejs.org/en/download)
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) with Linux containers enabled
 - [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli)
-- [Python 3.11 or later](https://www.python.org/downloads/) for Lab 3
+- [Python 3.11 or later](https://www.python.org/downloads/) for Lab 2
 
 Restart the terminal after installing software, then verify it:
 

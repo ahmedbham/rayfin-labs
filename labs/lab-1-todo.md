@@ -231,4 +231,4 @@ When the deployed resources are no longer needed, delete the parent Fabric App f
 - The app is deployed and validated with Fabric SSO.
 - You can identify the entity, authorization policy, typed client, and UI surfaces.
 
-[Next: Lab 2]({% link labs/lab-2-field-technician.md %}){: .btn .btn-primary }
+[Next: Lab 2]({% link labs/lab-2-dashboard.md %}){: .btn .btn-primary }

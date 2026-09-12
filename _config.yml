@@ -9,6 +9,9 @@ color_scheme: rayfin
 search_enabled: true
 heading_anchors: true
 
+plugins:
+  - jekyll-redirect-from
+
 aux_links:
   View on GitHub: https://github.com/ahmedbham/rayfin-labs
 aux_links_new_tab: true

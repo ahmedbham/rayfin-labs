@@ -1,12 +1,14 @@
 ---
 layout: default
-title: "Lab 3: Interactive dashboard"
+title: "Lab 2: Interactive dashboard"
 parent: Labs
-nav_order: 3
+nav_order: 2
 description: Use GitHub Copilot to build a cross-filterable Fabric App over a Power BI semantic model.
+redirect_from:
+  - /labs/lab-3-dashboard.html
 ---
 
-# Lab 3: Build an interactive dashboard
+# Lab 2: Build an interactive dashboard
 
 **Estimated time:** 90-120 minutes
 
@@ -21,11 +23,11 @@ In this lab, you deploy the bundled Contoso semantic model and use GitHub Copilo
 
 ## Before you begin
 
-Complete the [prerequisites]({% link prerequisites.md %}). Lab 3 requires Azure CLI authentication, Python 3.11 or later, Node.js and npm, a capacity-backed Fabric workspace, and Playwright. 
+Complete the [prerequisites]({% link prerequisites.md %}) and [Lab 1]({% link labs/lab-1-todo.md %}). Lab 2 requires Azure CLI authentication, Python 3.11 or later, Node.js and npm, a capacity-backed Fabric workspace, and Playwright.
 
 Open these workshop assets:
 
-- [Lab 3 prompt](https://github.com/ahmedbham/rayfin-labs/blob/main/LAB_3_PROMPT.md)
+- [Lab 2 prompt](https://github.com/ahmedbham/rayfin-labs/blob/main/LAB_2_PROMPT.md)
 - [Contoso semantic model](https://github.com/ahmedbham/rayfin-labs/tree/main/Contoso-DT-Dashboard.SemanticModel)
 - [Semantic model deployment helper](https://github.com/ahmedbham/rayfin-labs/blob/main/scripts/deploy_semantic_model.py)
 - [Create an app connected to a semantic model](https://learn.microsoft.com/en-us/fabric/apps/data-apps-template?source=recommendations)
@@ -239,5 +241,5 @@ Delete the deployed Fabric App when finished. Delete **Contoso DT Dashboard** on
 - Robust states, keyboard access, and responsive layouts are validated.
 - All automated checks pass and the deployed app works inside the Fabric portal through Fabric SSO.
 
-[Previous: Lab 2]({% link labs/lab-2-field-technician.md %}){: .btn }
-[Back to labs]({% link labs/index.md %}){: .btn .btn-primary }
+[Previous: Lab 1]({% link labs/lab-1-todo.md %}){: .btn }
+[Next: Lab 3]({% link labs/lab-3-field-technician.md %}){: .btn .btn-primary }

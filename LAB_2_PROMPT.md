@@ -1,14 +1,9 @@
 # Lab 2 implementation prompt
 
-Build a Microsoft Fabric App using Rayfin CLI that implements the functional requirements in `LAB_2_FUNCTIONAL_REQUIREMENTS.md`.
+Replace the example URL below with the complete semantic model URL copied from the Fabric portal before submitting this prompt to GitHub Copilot in Agent mode.
 
-Use Rayfin TypeScript entities to provision the application's SQL database in Fabric and generated data API. Implement role-aware authorization for dispatcher and technician workflows. Use Rayfin storage for job-note images when supported by the selected template.
+```text
+Build a [Microsoft Fabric App](https://learn.microsoft.com/fabric/apps/overview) using [Rayfin CLI](https://github.com/microsoft/rayfin) as an interactive, cross-filterable interface to the Power BI semantic model at https://msit.powerbi.com/groups/workspace-id/modeling/model-id/modelView
 
-Before writing code:
-
-1. Inspect the functional requirements and the scaffolded Rayfin project.
-2. Research the Rayfin patterns already available in the project and its installed skill or agent instructions.
-3. Produce an implementation plan covering the data model, authorization, routes, services, UI states, sample data, tests, and deployment.
-4. Map each functional-requirements section to one or more plan steps and identify assumptions or unsupported capabilities.
-
-During implementation, keep credentials and tokens out of source code and frontend assets. Add loading, empty, validation, success, and error states. Validate the result with lint, automated tests, a production build, and representative dispatcher and technician workflows.
+Before writing code, inspect the semantic model's tables, measures, columns, and relationships and produce an implementation plan that maps every proposed visual to real model fields or measures. Include KPI summaries and analytical views for operational metrics, investment, initiatives, asset visibility, and AI detections.
+```
