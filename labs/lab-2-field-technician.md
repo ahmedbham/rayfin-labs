@@ -1,14 +1,12 @@
 ---
 layout: default
-title: "Lab 3: Field technician app"
+title: "Lab 2: Field technician app"
 parent: Labs
-nav_order: 3
+nav_order: 2
 description: Use GitHub Copilot Plan mode and Code mode to build a role-aware field service Fabric App.
-redirect_from:
-  - /labs/lab-2-field-technician.html
 ---
 
-# Lab 3: Build a field technician app
+# Lab 2: Build a field technician app
 
 **Estimated time:** 90-150 minutes
 
@@ -23,11 +21,11 @@ In this lab, GitHub Copilot helps you turn business requirements into an impleme
 
 ## Before you begin
 
-Complete the [prerequisites]({% link prerequisites.md %}), [Lab 1]({% link labs/lab-1-todo.md %}), and [Lab 2]({% link labs/lab-2-dashboard.md %}). Keep this workshop open in one VS Code window and create the learner app in a separate folder or window.
+Complete the [prerequisites]({% link prerequisites.md %}) and [Lab 1]({% link labs/lab-1-todo.md %}). Keep this workshop open in one VS Code window and create the learner app in a separate folder or window.
 
 Open these authoritative inputs before planning:
 
-- [Lab 3 prompt](https://github.com/ahmedbham/rayfin-labs/blob/main/lab-assets/lab-3/LAB_3_PROMPT.md)
+- [Field technician prompt](https://github.com/ahmedbham/rayfin-labs/blob/main/lab-assets/lab-3/LAB_3_PROMPT.md)
 - [Field technician functional requirements](https://github.com/ahmedbham/rayfin-labs/blob/main/lab-assets/lab-3/LAB_3_FUNCTIONAL_REQUIREMENTS.md)
 
 {: .important }
@@ -206,5 +204,5 @@ Stop or remove local containers using the scaffold's scripts. Delete the deploye
 - Lint, tests, and production build pass.
 - The deployed app works with Fabric SSO and its generated SQL database.
 
-[Previous: Lab 2]({% link labs/lab-2-dashboard.md %}){: .btn }
-[Back to labs]({% link labs/index.md %}){: .btn .btn-primary }
+[Previous: Lab 1]({% link labs/lab-1-todo.md %}){: .btn }
+[Next: Lab 3]({% link labs/lab-3-dashboard.md %}){: .btn .btn-primary }
