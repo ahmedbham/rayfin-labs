@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import base64
 import json
+import shutil
 import subprocess
 import sys
 import time
@@ -14,6 +15,7 @@ from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote
 from urllib.request import Request, urlopen
+from uuid import UUID
 
 
 FABRIC_API = "https://api.fabric.microsoft.com/v1"
@@ -25,7 +27,10 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Deploy the bundled TMDL semantic model through the Fabric REST API."
     )
-    parser.add_argument("--workspace-id", help="Target Fabric workspace GUID.")
+    parser.add_argument(
+        "--workspace-id",
+        help="Target Fabric workspace GUID or exact display name.",
+    )
     parser.add_argument(
         "--model-dir",
         type=Path,
@@ -88,11 +93,22 @@ def build_parts(model_dir: Path) -> list[dict[str, str]]:
     return parts
 
 
+def get_az_executable() -> str:
+    executable = shutil.which("az")
+    if not executable:
+        raise RuntimeError(
+            "Azure CLI was not found in PATH. Install it, fully restart VS Code, "
+            "and run 'az login'. Run 'az version' to verify the installation."
+        )
+    return executable
+
+
 def get_access_token() -> str:
+    executable = get_az_executable()
     try:
         result = subprocess.run(
             [
-                "az",
+                executable,
                 "account",
                 "get-access-token",
                 "--resource",
@@ -107,7 +123,10 @@ def get_access_token() -> str:
             text=True,
         )
     except FileNotFoundError as error:
-        raise RuntimeError("Azure CLI was not found. Install it and run 'az login'.") from error
+        raise RuntimeError(
+            "Azure CLI was resolved in PATH but could not be launched. "
+            "Run 'az version' to verify the installation, then fully restart VS Code."
+        ) from error
     except subprocess.CalledProcessError as error:
         detail = error.stderr.strip() or error.stdout.strip()
         raise RuntimeError(f"Azure CLI authentication failed: {detail}") from error
@@ -116,6 +135,29 @@ def get_access_token() -> str:
     if not token:
         raise RuntimeError("Azure CLI returned an empty Fabric access token. Run 'az login'.")
     return token
+
+
+def resolve_workspace_id(workspace: str, token: str) -> str:
+    try:
+        return str(UUID(workspace))
+    except ValueError:
+        _, payload, _ = request_json("GET", f"{FABRIC_API}/workspaces", token)
+        matches = [
+            item
+            for item in payload.get("value", [])
+            if item.get("displayName") == workspace
+        ]
+        if not matches:
+            raise ValueError(
+                f"No accessible Fabric workspace has the exact display name '{workspace}'."
+            )
+        if len(matches) > 1:
+            workspace_ids = ", ".join(str(item.get("id")) for item in matches)
+            raise ValueError(
+                f"Multiple accessible Fabric workspaces are named '{workspace}'. "
+                f"Re-run with one of these workspace GUIDs: {workspace_ids}"
+            )
+        return str(matches[0]["id"])
 
 
 def request_json(
@@ -138,6 +180,10 @@ def request_json(
         with urlopen(request, timeout=60) as response:
             raw = response.read().decode("utf-8")
             payload = json.loads(raw) if raw else {}
+            if payload is None:
+                payload = {}
+            if not isinstance(payload, dict):
+                raise RuntimeError("Fabric API returned an unexpected non-object JSON response.")
             return response.status, payload, dict(response.headers.items())
     except HTTPError as error:
         raw = error.read().decode("utf-8", errors="replace")
@@ -196,8 +242,9 @@ def deploy(args: argparse.Namespace, parts: list[dict[str, str]]) -> str:
         raise ValueError("--workspace-id is required unless --dry-run is used.")
 
     token = get_access_token()
-    verify_workspace(args.workspace_id, token)
-    existing = find_existing_model(args.workspace_id, args.display_name, token)
+    workspace_id = resolve_workspace_id(args.workspace_id, token)
+    verify_workspace(workspace_id, token)
+    existing = find_existing_model(workspace_id, args.display_name, token)
     definition = {"format": "TMDL", "parts": parts}
 
     if existing:
@@ -208,12 +255,12 @@ def deploy(args: argparse.Namespace, parts: list[dict[str, str]]) -> str:
             )
         model_id = existing["id"]
         url = (
-            f"{FABRIC_API}/workspaces/{quote(args.workspace_id)}/semanticModels/"
+            f"{FABRIC_API}/workspaces/{quote(workspace_id)}/semanticModels/"
             f"{quote(model_id)}/updateDefinition"
         )
         status, payload, headers = request_json("POST", url, token, {"definition": definition})
     else:
-        url = f"{FABRIC_API}/workspaces/{quote(args.workspace_id)}/semanticModels"
+        url = f"{FABRIC_API}/workspaces/{quote(workspace_id)}/semanticModels"
         status, payload, headers = request_json(
             "POST",
             url,
@@ -226,7 +273,7 @@ def deploy(args: argparse.Namespace, parts: list[dict[str, str]]) -> str:
         payload = poll_operation(url, token, headers)
         model_id = payload.get("id") or payload.get("itemId") or model_id
 
-    deployed = find_existing_model(args.workspace_id, args.display_name, token)
+    deployed = find_existing_model(workspace_id, args.display_name, token)
     if not deployed:
         raise RuntimeError("Deployment completed, but the semantic model was not found in the workspace.")
     return str(deployed["id"])

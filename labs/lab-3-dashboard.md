@@ -21,13 +21,14 @@ In this lab, you deploy the bundled Contoso semantic model and use GitHub Copilo
 
 ## Before you begin
 
-Complete the [prerequisites]({% link prerequisites.md %}). Lab 3 requires Azure CLI authentication, Python 3.11 or later, a capacity-backed Fabric workspace, and Playwright.
+Complete the [prerequisites]({% link prerequisites.md %}). Lab 3 requires Azure CLI authentication, Python 3.11 or later, Node.js and npm, a capacity-backed Fabric workspace, and Playwright. 
 
 Open these workshop assets:
 
 - [Lab 3 prompt](https://github.com/ahmedbham/rayfin-labs/blob/main/LAB_3_PROMPT.md)
 - [Contoso semantic model](https://github.com/ahmedbham/rayfin-labs/tree/main/Contoso-DT-Dashboard.SemanticModel)
 - [Semantic model deployment helper](https://github.com/ahmedbham/rayfin-labs/blob/main/scripts/deploy_semantic_model.py)
+- [Create an app connected to a semantic model](https://learn.microsoft.com/en-us/fabric/apps/data-apps-template?source=recommendations)
 
 ## Exercise 1: Deploy the semantic model
 
@@ -39,11 +40,11 @@ python scripts/deploy_semantic_model.py --dry-run
 
 The command should list 10 parts: `definition.pbism`, database/model/relationship definitions, and six table definitions.
 
-Sign in and deploy the model. Replace the placeholder with the workspace GUID recorded during setup:
+Sign in and deploy the model. Replace the placeholder with the workspace GUID or exact display name recorded during setup:
 
 ```powershell
 az login
-python scripts/deploy_semantic_model.py --workspace-id <workspace-id>
+python scripts/deploy_semantic_model.py --workspace-id <workspace-id-or-name>
 ```
 
 The helper verifies capacity assignment, obtains a Fabric-scoped access token from Azure CLI, packages each TMDL file as inline base64, polls asynchronous operations, and prints the semantic model ID. It does not persist the token.
@@ -51,7 +52,7 @@ The helper verifies capacity assignment, obtains a Fabric-scoped access token fr
 If a model named **Contoso DT Dashboard** already exists and you intentionally want to replace its complete definition, use:
 
 ```powershell
-python scripts/deploy_semantic_model.py --workspace-id <workspace-id> --update-existing
+python scripts/deploy_semantic_model.py --workspace-id <workspace-id-or-name> --update-existing
 ```
 
 {: .warning }
@@ -70,31 +71,48 @@ Open the model in the Fabric workspace and confirm these tables:
 
 Record the semantic model ID printed by the helper. It is also the dataset ID used by Power BI APIs.
 
+In the Fabric portal, select **Contoso DT Dashboard** to open the semantic model. Copy the complete URL from the browser address bar and store it for the app-building prompt. It has this form:
+
+```text
+https://msit.powerbi.com/groups/workspace-id/modeling/model-id/modelView
+```
+
+Keep the actual workspace and model IDs in the copied URL. Do not use the placeholder URL in the later prompt.
+
 {: .checkpoint }
-The model appears in the target workspace, all six tables are present, and you have its semantic model ID.
+The model appears in the target workspace, all six tables are present, and you have stored its complete model URL for later use.
 
-## Exercise 2: Prepare the analytics starter
+## Exercise 2: Create the Fabric data app
 
-In a sibling projects folder, clone the code-sample template:
+Follow the current Microsoft Learn instructions in [Create an app connected to a semantic model](https://learn.microsoft.com/en-us/fabric/apps/data-apps-template?source=recommendations). From the parent folder where you keep projects, run:
 
 ```powershell
-git clone https://github.com/ahmedbham/rayfin-nyc-taxi-app.git contoso-dt-dashboard-app
-cd contoso-dt-dashboard-app
-npm install
+npm create @microsoft/rayfin@latest -- "<appitemname>" --template dataapp --workspace <workspacename>
+```
+
+Replace `<appitemname>` with a unique Fabric App item name, such as `contoso-dt-dashboard-app`, and replace `<workspacename>` with the exact display name of the workspace containing the semantic model. Keep the quotation marks around the app item name when it contains spaces.
+
+When the command finishes, change to the generated app directory and open it in Visual Studio Code:
+
+```powershell
+cd "<appitemname>"
 code .
 ```
 
-Copy `LAB_3_PROMPT.md` and the `Contoso-DT-Dashboard.SemanticModel` folder from this workshop into a temporary `requirements/` folder in the starter project. The model copy gives Copilot local schema context; the deployed workspace model remains the runtime source.
+{: .checkpoint }
+The generated data app project is open in Visual Studio Code and the Fabric App item appears in the target workspace.
 
-Inspect the starter's `README.md`, `AGENTS.md`, `.agents/skills/`, `fabric.yaml`, semantic-model query services, authentication setup, package scripts, and tests. Follow the starter's current environment-variable pattern for workspace and semantic model IDs.
+## Exercise 3: Build with GitHub Copilot
 
-Do not commit environment files containing IDs or tokens. A workspace/model GUID is not a password, but keeping environment-specific configuration outside source makes the app portable and prevents accidental tenant coupling.
+In Visual Studio Code, open GitHub Copilot Chat and select **Agent** mode. Paste the following prompt, replacing the example semantic model URL with the complete URL you stored in Exercise 1:
 
-## Exercise 3: Plan with Copilot
+```text
+Build a [Microsoft Fabric App](https://learn.microsoft.com/fabric/apps/overview) using [Rayfin CLI](https://github.com/microsoft/rayfin) as an interactive, cross-filterable interface to the Power BI semantic model at https://msit.powerbi.com/groups/workspace-id/modeling/model-id/modelView
 
-Open Copilot Chat in **Plan** mode. Attach `requirements/LAB_3_PROMPT.md`, the semantic model `definition/model.tmdl`, `definition/relationships.tmdl`, and all table TMDL files. Enter:
+Before writing code, inspect the semantic model's tables, measures, columns, and relationships and produce an implementation plan that maps every proposed visual to real model fields or measures. Include KPI summaries and analytical views for operational metrics, investment, initiatives, asset visibility, and AI detections.
+```
 
-> Follow `LAB_3_PROMPT.md`. Inspect this analytics starter and the complete local TMDL model. Produce an ordered implementation plan without editing files. Include a visual-to-model mapping, query strategy, shared filter-state design, cross-filter interaction matrix, component and test plan, responsive behavior, and focused validation after each phase. Flag any visual that cannot be supported by an existing field or measure.
+Copilot can use the model URL to identify the workspace and semantic model. Let Agent mode inspect the generated template and model metadata, then review its plan before approving implementation.
 
 ### Review rubric
 
@@ -111,16 +129,14 @@ Approve the plan only when it includes:
 | State model | Initial loading, per-query failure, empty result, partial data, retry, stale request cancellation, and no-selection behavior. |
 | Quality | Keyboard operation, focus indication, text alternatives, color-independent status, responsive layout, tests, and Playwright checks. |
 
-Avoid a plan that loads the full dataset into the browser or simulates filtering only on already-rendered values. Prefer the starter's semantic-model query abstraction and issue appropriately filtered/aggregated queries.
+Avoid a plan that loads the full dataset into the browser or simulates filtering only on already-rendered values. Preserve the data app template's semantic-model query abstraction and issue appropriately filtered and aggregated queries.
 
 {: .checkpoint }
 Every visual maps to real model metadata, and the approved plan defines shared filters, compatible interactions, query behavior, and executable tests.
 
-## Exercise 4: Implement in Code mode
+## Exercise 4: Implement and validate locally
 
-Switch Copilot to **Agent** mode and enter:
-
-> Implement the approved plan one phase at a time, preserving the starter's Fabric authentication and query abstractions. Begin with typed filter state, query definitions, and focused tests. After each phase, run the narrowest validation and stop for review. Do not invent model fields or hard-code credentials and semantic model IDs.
+Ask Copilot Agent to implement the approved plan. Keep the data app template's Fabric authentication, semantic-model connectivity, visualization primitives, formatting, and query patterns intact. Do not invent model fields, hard-code credentials, or load the full dataset into the browser.
 
 Use this implementation order:
 
@@ -133,11 +149,21 @@ Use this implementation order:
 7. Keyboard/accessibility behavior and responsive layout.
 8. Automated tests and Playwright browser scenarios.
 
-After each phase, inspect the changed queries against the TMDL. Measure names containing spaces or punctuation must be referenced exactly as required by the starter's query API.
+After each phase, have Copilot run the narrowest available validation. Measure names containing spaces or punctuation must be referenced exactly as exposed by the semantic model.
+
+Run the generated project's lint, test, and production build commands. Use the scripts defined in its `package.json`; these are typically:
+
+```powershell
+npm run lint
+npm run test
+npm run build
+```
+
+Ask Copilot to use the template's Playwright browser-validation workflow to check initial rendering, cross-filtering, reset behavior, errors, and desktop/mobile layout. Inspect the screenshots rather than treating a successful element lookup as visual proof.
 
 ## Exercise 5: Preview in the Fabric shell
 
-Start the local frontend:
+Start the local frontend using the command documented by the generated template, typically:
 
 ```powershell
 npm run dev
@@ -160,47 +186,32 @@ Validate these interactions manually:
 5. Reset filters and confirm the default dashboard returns.
 6. Force or simulate one query failure and confirm other successful sections remain useful.
 
-## Exercise 6: Run automated validation
-
-Run the starter's checks:
-
-```powershell
-npm run lint
-npm run test
-npm run build
-```
-
-Run the project's Playwright command if Copilot added one, typically:
-
-```powershell
-npm run test:e2e
-```
-
-The browser suite should cover:
-
-- Nonblank initial render after loading.
-- A filter selection changing at least two compatible visuals.
-- Reset restoring default query state.
-- Empty and failed-query messages.
-- Keyboard access to filters and reset.
-- Desktop and mobile viewports with no overlapping text or controls.
-
-Inspect screenshots rather than treating a successful element lookup as visual proof.
-
 {: .checkpoint }
 Lint, unit/component tests, production build, and browser checks pass; desktop and mobile screenshots show a usable, nonblank dashboard.
 
-## Exercise 7: Deploy the Fabric App
+## Exercise 6: Deploy and verify the Fabric App
 
-Use the starter's documented Rayfin/Fabric deployment command. Confirm the environment points to the deployed Contoso model, then deploy to the same capacity-backed workspace.
+From the generated app directory, deploy the app to Fabric with Rayfin:
+
+```powershell
+npx rayfin up
+```
+
+Wait for the command to complete successfully. In the Fabric portal, open the target workspace, select the Fabric App item created in Exercise 2, and verify that the latest build is available inside the Fabric portal.
 
 After deployment:
 
-1. Open the App URL and verify Microsoft Entra ID SSO.
+1. Open the app inside the Fabric portal and verify that it renders without a separate sign-in prompt.
 2. Confirm the deployed app queries the intended semantic model ID.
 3. Repeat one cross-filter and reset scenario.
 4. Test with a user who has **Run and interact** on the app and **Build** permission on the semantic model.
 5. Confirm no token or credential appears in source, generated JavaScript, browser storage, or network query parameters.
+
+{: .note }
+Semantic-model-connected Fabric Apps currently must run inside the Fabric portal. Opening the app in a standalone browser window can cause visual queries to fail.
+
+{: .checkpoint }
+The Rayfin deployment succeeds, the latest app build opens in the Fabric portal, live semantic-model data renders, and cross-filter and reset interactions work.
 
 ## Troubleshooting
 
@@ -209,8 +220,11 @@ After deployment:
 | Helper returns `401` | Run `az login` again. The helper requests the `https://api.fabric.microsoft.com` audience. |
 | Helper returns `403` | Stop and obtain Contributor or higher workspace access. |
 | Helper reports no capacity | Assign the workspace to a supported Fabric capacity before retrying. |
+| Rayfin cannot create the app item | Confirm the Fabric Apps workload is enabled and that you are a workspace Contributor or Admin. |
+| Visual queries return permission errors | Confirm the Semantic Model Execute Queries REST API tenant setting is enabled and the user has Build and Read permissions on the model. |
 | A query reports an unknown field or measure | Compare its exact name and table with the local TMDL; do not guess aliases. |
 | Local page is blank outside Fabric | Use the Fabric shell URL with `devUri` so brokered authentication/context is available. |
+| Deployed visuals fail in a standalone window | Open the Fabric App from its workspace in the Fabric portal. Standalone opening is currently unsupported for semantic-model-connected apps. |
 | Filters race and show stale results | Cancel or disregard older requests when filter state changes. Add a regression test. |
 
 ## Clean up
@@ -219,11 +233,11 @@ Delete the deployed Fabric App when finished. Delete **Contoso DT Dashboard** on
 
 ## Completion criteria
 
-- The bundled TMDL model is reproducibly deployed and its ID recorded.
+- The bundled TMDL model is reproducibly deployed and its complete model URL is stored.
 - The approved plan maps every visual to real model metadata.
 - Compatible visuals cross-filter through shared state and reset correctly.
 - Robust states, keyboard access, and responsive layouts are validated.
-- All automated checks pass and the app works through Fabric SSO.
+- All automated checks pass and the deployed app works inside the Fabric portal through Fabric SSO.
 
 [Previous: Lab 2]({% link labs/lab-2-field-technician.md %}){: .btn }
 [Back to labs]({% link labs/index.md %}){: .btn .btn-primary }

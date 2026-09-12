@@ -23,12 +23,55 @@ By the end of this lab, you can:
 
 ## Before you begin
 
-Complete the [prerequisites]({% link prerequisites.md %}), including Docker Desktop and a capacity-backed Fabric workspace.
+Complete the [prerequisites]({% link prerequisites.md %}), including a capacity-backed Fabric workspace.
 
 {: .warning }
 The template uses experimental username/password authentication and Docker local hosting. Its APIs and commands can change. Deployed Fabric Apps use Microsoft Entra ID single sign-on instead of local password authentication.
 
-## Exercise 1: Scaffold the application
+## Option A: Run the lab in GitHub Codespaces
+
+After creating a GitHub Codespace from your fork, use this path to scaffold and deploy the Todo app from the Codespace:
+
+1. Open GitHub Copilot Chat, switch to **Agent** mode, and ask Copilot to install the Azure CLI (`az`).
+2. Open a terminal in the Codespace and scaffold the app:
+
+	```bash
+	npm create @microsoft/rayfin@latest -- --template https://github.com/microsoft/awesome-rayfin --template-name "[Experimental] Todo app with full local dev"
+	```
+
+3. When prompted, name the project `rayfin-todo-app`. Then install dependencies and build it:
+
+	```bash
+	cd rayfin-todo-app
+	npm install
+	npm run build
+	```
+
+4. Set your Microsoft Entra tenant ID and sign in to Rayfin:
+
+	```bash
+	RAYFIN_TENANT_ID=<tenant-guid>
+	npx rayfin login -t $RAYFIN_TENANT_ID --encryption-fallback-enabled
+	```
+
+5. Complete sign-in in the browser. If the browser opens a page showing **Hmmm... can't reach this page**:
+	- Copy the complete URL from the page. It starts with `localhost:`.
+	- Open a new terminal in the Codespace.
+	- Run the callback URL through `curl`:
+
+	  ```bash
+	  curl "<copied-url>"
+	  ```
+
+6. Return to the original terminal and deploy the app to Fabric:
+
+	```bash
+	npm run up
+	```
+
+## Option B: Run the lab in Local development
+
+### Exercise 1: Scaffold the application
 
 Open PowerShell in a folder where you keep projects. Do not generate the application inside the cloned workshop repository.
 
@@ -64,7 +107,7 @@ In `Todo.ts`, locate the `@entity()` decorator and the `@role()` policy. Trace h
 {: .checkpoint }
 You can explain which file defines storage and authorization, and which file calls that generated API from the browser.
 
-## Exercise 2: Run the full stack locally
+### Exercise 2: Run the full stack locally
 
 Start Docker Desktop and verify the engine:
 
@@ -97,7 +140,7 @@ Open [http://localhost:5173](http://localhost:5173). Create an account with a te
 {: .checkpoint }
 Local authentication works, CRUD changes survive refresh, and the role policy isolates data between users.
 
-## Exercise 3: Make a small change
+### Exercise 3: Make a small change
 
 Change the application title and empty-state message in the relevant React components. Use a name and message that make the app recognizably yours.
 
@@ -109,7 +152,7 @@ Next, ask Copilot Chat this focused question without asking it to edit code:
 
 Compare its answer with the files you inspected. Treat Copilot's explanation as a hypothesis and verify every reference in the code.
 
-## Exercise 4: Validate the project
+### Exercise 4: Validate the project
 
 Run the checks exposed by the template:
 
@@ -134,7 +177,7 @@ Use `npm run dev:local:purge` only when you intentionally want to delete local v
 {: .checkpoint }
 Lint, tests, and the production build complete successfully.
 
-## Exercise 5: Deploy to Fabric
+### Exercise 5: Deploy to Fabric
 
 Stop the local development command. Sign in when the Rayfin CLI prompts you, then run:
 

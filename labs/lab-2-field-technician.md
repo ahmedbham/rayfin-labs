@@ -39,7 +39,9 @@ In a projects folder, scaffold a current Rayfin starter suitable for a data-driv
 npm create @microsoft/rayfin@latest
 ```
 
-Name it `field-technician-app`, select a TypeScript/React template with data and authentication, then install dependencies and open it:
+- In response to `How would you like to start?`, select **Use a template (built-in)**.
+- Under `Select a template:`, select `1` (**Blank App - Bare-bones Fabric-authenticated React + Vite app — sign-in, routing, and a placeholder home page, with no data layer to remove**)
+- Under `Project name:`, enter `field-technician-app`.
 
 ```powershell
 cd field-technician-app
