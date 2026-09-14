@@ -58,19 +58,7 @@ The technician home page should show work assigned to the signed-in technician.
 14. Each section should show a clear empty message when it has no jobs.
 15. The page should show an understandable error if job information cannot be loaded.
 
-## 6. Photos
-
-1. A technician should be able to attach one image to a new job note.
-2. A technician should be able to choose an existing image from the device.
-3. When the browser and device support it, a user should be able to take a photo with the camera.
-4. The user should see a preview before saving the note.
-5. The user should be able to remove the preview and choose another image.
-6. The saved image should appear with the note in the job history.
-7. The camera view should allow the user to capture a photo or cancel.
-8. The application should explain when camera access is unavailable or denied.
-9. A failed image or note save should not be shown as successful.
-
-## 7. Job Details Page
+## 6. Job Details Page
 
 1. The job details page should show the job title and current status.
 2. The page should show the customer name when available.
@@ -83,7 +71,7 @@ The technician home page should show work assigned to the signed-in technician.
 9. The page should show a clear message when job information cannot be loaded.
 10. Related customer, equipment, checklist, and history information should be loaded with the job.
 
-## 8. Sample Data
+## 7. Sample Data
 
 Include a sample-data page to make the application easier to explore.
 
