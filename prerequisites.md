@@ -31,6 +31,8 @@ Running the labs on a laptop is recommended because browser authentication, Dock
 
 ## 1. Prepare Microsoft Fabric
 
+### Setting Fabric Workspace
+
 Complete these steps in Microsoft Fabric:
 
 1. Open [Microsoft Fabric](https://app.fabric.microsoft.com/).
@@ -38,6 +40,20 @@ Complete these steps in Microsoft Fabric:
 3. Select **My workspace** from the left menu.
 4. Select **Workspace settings** from the top right.
 5. Under **Workspace type**, ensure that **Fabric Trial** is selected and a trial capacity is assigned to the workspace. All lab artifacts will be deployed to this workspace.
+
+**IMPORTANT**: You also have the option to create a new Fabric workspace if you do not want to use **My workspace**. Ensure that the new workspace is of type **Fabric Trial** and has a trial capacity assigned. Make sure to capture the `Workspace ID` for the new workspace.
+
+### Signing Up for Fabric Trial (Optional)
+
+If you do not have a Fabric trial, and would want to sign up for one, follow these steps:
+
+1. Open [Microsoft Fabric](https://app.fabric.microsoft.com/).
+2. At the bottom left, if **Power BI** is displayed, select it and switch to **Fabric**.
+3. Select your profile image at the top right corner.
+4. Select **Start Fabric Trial**. Complete the sign-up process as prompted.
+3. Select **My workspace** from the left menu.
+4. Select **Workspace settings** from the top right.
+5. Under **Workspace type**, ensure that the new **Fabric Trial** is selected and a trial capacity is assigned to the workspace. All lab artifacts will be deployed to this workspace.
 
 ## 2. Install developer tools
 
@@ -78,7 +94,7 @@ node --version
 npm --version
 ```
 
-Remove Rayfin CLI version 1.35.0 if it is installed, then install version 1.34.0 globally and verify the installation. The labs pin this version because version 1.35.0 changes the browser callback behavior used in GitHub Codespaces.
+Remove Rayfin CLI version 1.35.0 if it is installed, then install version 1.34.0 globally and verify the installation. The labs pin this version because version 1.35.0 changes the browser callback behavior used in GitHub Codespaces, and causes rayfin template build to fail in local development.
 
 ```bash
 npm uninstall --global @microsoft/rayfin-cli@1.35.0

@@ -118,10 +118,13 @@ cd "<appitemname>"
 
 ## Exercise 3: Build with GitHub Copilot
 
-Open GitHub Copilot Chat and select **Agent** mode. Paste the following prompt, replacing the example semantic model URL with the complete URL you stored in Exercise 1:
+Open GitHub Copilot Chat and select **Agent** mode. Paste the following prompt, replacing the example semantic model URL, Workspace ID, and Tenant ID with the complete URL you stored in Exercise 1:
 
 ```text
-Update Fabric app **my-lab2-dt-app** as an interactive, cross-filterable interface to the Power BI semantic model at "https://msit.powerbi.com/groups/workspace-id/modeling/model-id/modelView". For reference, **dt-dashboard-report-image.png** is a screenshot of a Power Bi report on this semantic model.   
+Update Fabric app **my-lab2-dt-app** as an interactive, cross-filterable interface to the Power BI semantic model at "https://msit.powerbi.com/groups/workspace-id/modeling/model-id/modelView". For reference, **dt-dashboard-report-image.png** is a screenshot of a Power Bi report on this semantic model.
+
+Workspace ID: "<workspace-id>"
+Tenant ID: "<tenant-id>"
 ```
 
 Copilot can use the model URL to identify the workspace and semantic model. 

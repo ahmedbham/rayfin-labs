@@ -54,8 +54,12 @@ npm install
 
 Open Copilot Chat and select **Agent** mode. Attach folder `lab-assets/lab-3/` folder, then enter:
 
-> Follow `LAB_3_PROMPT.md`. 
+```text
+Follow `LAB_3_PROMPT.md`. 
 
+Workspace ID: "<workspace-id>"
+Tenant ID: "<tenant-id>"
+```
 
 ## Exercise 6: Deploy to Fabric
 

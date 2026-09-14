@@ -111,19 +111,7 @@ Open [http://localhost:5173](http://localhost:5173). Create an account with a te
 {: .checkpoint }
 Local authentication works, CRUD changes survive refresh, and the role policy isolates data between users.
 
-### Exercise 3: Make a small change
-
-Change the application title and empty-state message in the relevant React components. Use a name and message that make the app recognizably yours.
-
-Save the files and observe Vite update the browser without restarting the backend. Check the page at narrow and wide browser widths and verify that controls remain usable.
-
-Next, ask Copilot Chat this focused question without asking it to edit code:
-
-> Trace a Todo from the form submission through the typed Rayfin client to the entity definition. Identify the files and methods involved, and explain where authorization is enforced.
-
-Compare its answer with the files you inspected. Treat Copilot's explanation as a hypothesis and verify every reference in the code.
-
-### Exercise 4: Validate the project
+### Exercise 3: Validate the project
 
 Run the checks exposed by the template:
 
@@ -148,20 +136,13 @@ Use `npm run dev:local:purge` only when you intentionally want to delete local v
 {: .checkpoint }
 Lint, tests, and the production build complete successfully.
 
-### Exercise 5: Deploy to Fabric
+### Exercise 4: Deploy to Fabric
 
 Stop the local development command. Sign in when the Rayfin CLI prompts you, then run:
 
 ```bash
 npm run up
 ```
-
-Select the capacity-backed workspace prepared earlier. If the generated template exposes `npm run dev` as its cloud-connected development command, you can use it to deploy services and run Vite locally against the Fabric backend:
-
-```bash
-npm run dev
-```
-
 After deployment:
 
 1. Open the Fabric workspace and select the new Fabric App.
@@ -175,7 +156,9 @@ Do not change the generated schema directly in the Fabric SQL editor. Schema cha
 {: .checkpoint }
 The deployed URL loads with Fabric SSO, Todo operations succeed, and the generated SQL database appears as a child item.
 
-## Troubleshooting
+**IMPORTANT**: Open .env file under rayfin folder for Todo app and capture the value for RAYFIN_PUBLIC_WORKSPACE_ID. This ID represents the Workspace ID for `My workspace` and needs to be specified in the prompt for Lab 2 and Lab 3 if you are using this workspace for these labs.
+
+### Troubleshooting
 
 | Symptom | Resolution |
 |:--------|:-----------|
