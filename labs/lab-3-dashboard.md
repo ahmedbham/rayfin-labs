@@ -21,7 +21,16 @@ In this lab, you deploy the bundled Contoso semantic model and use GitHub Copilo
 
 ## Before you begin
 
-Complete the [prerequisites]({% link prerequisites.md %}). Lab 3 requires Azure CLI authentication, Python 3.11 or later, Node.js and npm, a capacity-backed Fabric workspace, and Playwright. 
+Complete the [prerequisites]({% link prerequisites.md %}). Lab 3 requires Azure CLI and Rayfin authentication, Python 3.11 or later, Node.js and npm, a capacity-backed Fabric workspace, and Playwright.
+
+Running this lab on a laptop is recommended. From the repository root, authenticate Azure CLI and Rayfin with the same Microsoft Entra tenant account:
+
+```bash
+az login -t <tenant-id>
+rayfin login -t <tenant-id>
+```
+
+If the generated template specifically requires `rayfin auth` and `rayfin help` lists it, run that command as well. GitHub Codespaces is also supported: run `rayfin login -t <tenant-id> --encryption-fallback-enabled`; if the browser cannot reach its `localhost:` callback, copy the complete callback URL and run `curl "<copied-url>"` in a second Codespaces terminal.
 
 Open these workshop assets:
 
@@ -40,14 +49,13 @@ python scripts/deploy_semantic_model.py --dry-run
 
 The command should list 10 parts: `definition.pbism`, database/model/relationship definitions, and six table definitions.
 
-Sign in and deploy the model. Replace the placeholder with the workspace GUID or exact display name recorded during setup:
+Deploy the model. Replace the placeholder with the workspace GUID or exact display name recorded during setup:
 
 ```bash
-az login
 python scripts/deploy_semantic_model.py --workspace-id <workspace-id-or-name>
 ```
 
-The helper verifies capacity assignment, obtains a Fabric-scoped access token from Azure CLI, packages each TMDL file as inline base64, polls asynchronous operations, and prints the semantic model ID. It does not persist the token.
+The helper verifies capacity assignment, obtains a Fabric-scoped access token from Rayfin's authentication cache, packages each TMDL file as inline base64, polls asynchronous operations, and prints the semantic model ID. It does not persist the token.
 
 If a model named **Contoso DT Dashboard** already exists and you intentionally want to replace its complete definition, use:
 
@@ -84,7 +92,7 @@ The model appears in the target workspace, all six tables are present, and you h
 
 ## Exercise 2: Create the Fabric data app
 
-Follow the current Microsoft Learn instructions in [Create an app connected to a semantic model](https://learn.microsoft.com/en-us/fabric/apps/data-apps-template?source=recommendations). From the parent folder where you keep projects, run:
+Follow the current Microsoft Learn instructions in [Create an app connected to a semantic model](https://learn.microsoft.com/en-us/fabric/apps/data-apps-template?source=recommendations). Return to this workshop repository root, then run:
 
 ```bash
 rayfin init "<appitemname>" --template dataapp --workspace <workspacename>
@@ -217,7 +225,7 @@ The Rayfin deployment succeeds, the latest app build opens in the Fabric portal,
 
 | Symptom | Resolution |
 |:--------|:-----------|
-| Helper returns `401` | Run `az login` again. The helper requests the `https://api.fabric.microsoft.com` audience. |
+| Helper returns `401` | On a laptop, run `az login -t <tenant-id>`, then `rayfin login -t <tenant-id>`. In Codespaces, add `--encryption-fallback-enabled` to the Rayfin login. If the project explicitly requires `rayfin auth` and lists it in `rayfin help`, run that too. |
 | Helper returns `403` | Stop and obtain Contributor or higher workspace access. |
 | Helper reports no capacity | Assign the workspace to a supported Fabric capacity before retrying. |
 | Rayfin cannot create the app item | Confirm the Fabric Apps workload is enabled and that you are a workspace Contributor or Admin. |

@@ -28,52 +28,26 @@ Complete the [prerequisites]({% link prerequisites.md %}), including a capacity-
 {: .warning }
 The template uses experimental username/password authentication and Docker local hosting. Its APIs and commands can change. Deployed Fabric Apps use Microsoft Entra ID single sign-on instead of local password authentication.
 
-## Option A: Run the lab in GitHub Codespaces
+## Choose your environment
 
-After creating a GitHub Codespace from your fork, use this path to scaffold and deploy the Todo app from the Codespace:
+Running this lab on a laptop is recommended. From the cloned repository root, authenticate Azure CLI and Rayfin with the same Microsoft Entra tenant account:
 
-1. Open GitHub Copilot Chat, switch to **Agent** mode, and ask Copilot to install the Azure CLI (`az`).
-2. Open a terminal in the Codespace and scaffold the app:
+```bash
+az login -t <tenant-id>
+rayfin login -t <tenant-id>
+```
 
-	```bash
-	rayfin init --template https://github.com/microsoft/awesome-rayfin --template-name "[Experimental] Todo app with full local dev"
-	```
+If the generated template specifically requires `rayfin auth` and `rayfin help` lists it, run that command as well.
 
-3. When prompted, name the project `rayfin-todo-app`. Then install dependencies and build it:
+GitHub Codespaces is also supported. Open a Codespace from your fork, verify Azure CLI is installed, and run `rayfin login -t <tenant-id> --encryption-fallback-enabled`. If its browser callback shows **Hmmm... can't reach this page**, copy the complete `localhost:` callback URL and run it from a second Codespaces terminal:
 
-	```bash
-	cd rayfin-todo-app
-	npm install
-	npm run build
-	```
-
-4. Set your Microsoft Entra tenant ID and sign in to Rayfin:
-
-	```bash
-	RAYFIN_TENANT_ID=<tenant-guid>
-	rayfin login -t $RAYFIN_TENANT_ID --encryption-fallback-enabled
-	```
-
-5. Complete sign-in in the browser. If the browser opens a page showing **Hmmm... can't reach this page**:
-	- Copy the complete URL from the page. It starts with `localhost:`.
-	- Open a new terminal in the Codespace.
-	- Run the callback URL through `curl`:
-
-	  ```bash
-	  curl "<copied-url>"
-	  ```
-
-6. Return to the original terminal and deploy the app to Fabric:
-
-	```bash
-	npm run up
-	```
-
-## Option B: Run the lab in Local development
+```bash
+curl "<copied-url>"
+```
 
 ### Exercise 1: Scaffold the application
 
-Open bash in a folder where you keep projects. Do not generate the application inside the cloned workshop repository.
+Open a terminal at the root of this cloned workshop repository. The command creates the `rayfin-todo-app` folder here; do not create or switch to another parent folder first.
 
 ```bash
 rayfin init --template https://github.com/microsoft/awesome-rayfin --template-name "[Experimental] Todo app with full local dev"
@@ -209,6 +183,7 @@ The deployed URL loads with Fabric SSO, Todo operations succeed, and the generat
 | Symptom | Resolution |
 |:--------|:-----------|
 | Docker image pull is stale or fails | Run `docker pull ghcr.io/microsoft/rayfin/webservice:latest`, then retry. |
+| A Rayfin command reports that authentication is required | Run `rayfin login -t <tenant-id>`; add `--encryption-fallback-enabled` in Codespaces. If the project explicitly requires `rayfin auth` and `rayfin help` lists it, run that too. |
 | App loads but data operations fail locally | Confirm `npm run rayfin:db` completed after the containers started. |
 | Port 5173 is already used | Stop the other Vite process or use the alternate URL Vite prints. |
 | Local login works but deployed login differs | This is expected: deployment uses Fabric brokered Microsoft Entra ID authentication. |

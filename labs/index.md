@@ -9,7 +9,7 @@ permalink: /labs/
 
 # Labs
 
-Complete the labs in order if Rayfin is new to you. Each lab uses a separate application folder and ends with a deployed Fabric App.
+Complete the labs in order if Rayfin is new to you. Each lab generates its application folder in this repository root and ends with a deployed Fabric App.
 
 | Lab | Estimated time | Outcome |
 |:----|:---------------|:--------|

@@ -25,6 +25,15 @@ In this lab, you deploy the bundled Contoso semantic model and use GitHub Copilo
 
 Complete the [prerequisites]({% link prerequisites.md %}) and [Lab 1]({% link labs/lab-1-todo.md %}). Lab 2 requires an authenticated Rayfin CLI, Python 3.11 or later, Node.js and npm, a capacity-backed Fabric workspace, and Playwright.
 
+Running this lab on a laptop is recommended. From the repository root, sign in to Azure CLI and Rayfin with the same Microsoft Entra tenant account:
+
+```bash
+az login -t <tenant-id>
+rayfin login -t <tenant-id>
+```
+
+If the generated template specifically requires `rayfin auth` and `rayfin help` lists it, run that command as well. GitHub Codespaces is also supported: run `rayfin login -t <tenant-id> --encryption-fallback-enabled`; if the browser cannot reach its `localhost:` callback, copy the complete callback URL and run `curl "<copied-url>"` in a second Codespaces terminal.
+
 Open these workshop assets:
 
 - [Lab 2 prompt](https://github.com/ahmedbham/rayfin-labs/blob/main/lab-assets/lab-2/LAB_2_PROMPT.md)
@@ -48,23 +57,7 @@ python scripts/deploy_semantic_model.py --dry-run
 
 The command should list 10 parts: `definition.pbism`, database/model/relationship definitions, and six table definitions.
 
-- Set your Microsoft Entra tenant ID and sign in to Rayfin:
-
-	```bash
-	RAYFIN_TENANT_ID=<tenant-guid>
-	rayfin login -t $RAYFIN_TENANT_ID --encryption-fallback-enabled
-	```
-
-- Complete sign-in in the browser. If the browser opens a page showing **Hmmm... can't reach this page**:
-	- Copy the complete URL from the page. It starts with `localhost:`.
-	- Open a new terminal in the Codespace.
-	- Run the callback URL through `curl`:
-
-	  ```bash
-	  curl "<copied-url>"
-	  ```
-
-- Return to the original terminal and deploy the app to Fabric:
+- Deploy the semantic model to Fabric:
 
 	```bash
 	python scripts/deploy_semantic_model.py --workspace-id <workspace-id-or-name>
@@ -109,7 +102,7 @@ The model appears in the target workspace, all six tables are present, and you h
 
 ## Exercise 2: Create the Fabric data app
 
-Follow the current Microsoft Learn instructions in [Create an app connected to a semantic model](https://learn.microsoft.com/en-us/fabric/apps/data-apps-template?source=recommendations). From the parent folder where you keep projects (for example, `cd "$GITHUB_WORKSPACE"` in Codepace), run
+Follow the current Microsoft Learn instructions in [Create an app connected to a semantic model](https://learn.microsoft.com/en-us/fabric/apps/data-apps-template?source=recommendations). Return to this workshop repository root, then run:
 
 ```bash
 rayfin init "<appitemname>" --template dataapp --workspace <workspacename>
@@ -156,7 +149,7 @@ The Rayfin deployment succeeds, the latest app build opens in the Fabric portal,
 
 | Symptom | Resolution |
 |:--------|:-----------|
-| Helper returns `401` | Run `rayfin login -t <tenant-id> --encryption-fallback-enabled` again. The helper requests Rayfin's default Fabric scope. |
+| Helper returns `401` | On a laptop, run `az login -t <tenant-id>`, then `rayfin login -t <tenant-id>`. In Codespaces, add `--encryption-fallback-enabled` to the Rayfin login. If the project explicitly requires `rayfin auth` and lists it in `rayfin help`, run that too. |
 | Helper returns `403` | Stop and obtain Contributor or higher workspace access. |
 | Tables contain no data after deployment | Select **Refresh now** for the semantic model and wait for refresh history to report **Completed**. |
 | Helper reports no capacity | Assign the workspace to a supported Fabric capacity before retrying. |

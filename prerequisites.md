@@ -16,7 +16,8 @@ Fabric Apps is a preview workload and is not available in every region.
 
 | Requirement | Lab 1 | Lab 2 | Lab 3 |
 |:------------|:-----:|:-----:|:-----:|
-| GitHub Codespaces | Recommended | Recommended | Recommended |
+| Laptop with VS Code | Recommended | Recommended | Recommended |
+| GitHub Codespaces | Supported | Supported | Supported |
 | VS Code and GitHub Copilot Chat | Required | Required | Required |
 | Git and Node.js 22 | Required | Required | Required |
 | Rayfin CLI (`@microsoft/rayfin-cli`) | Required | Required if prompted by the lab | Required |
@@ -26,7 +27,7 @@ Fabric Apps is a preview workload and is not available in every region.
 | Python 3.11 or later | No | Required for model deployment | No |
 | Playwright CLI | No | Required | Recommended |
 
-When using GitHub Codespaces, only Azure CLI is required from the developer tools listed in this matrix. The remaining developer tool requirements apply to local development.
+Running the labs on a laptop is recommended because browser authentication, Docker networking, and local callbacks work directly. GitHub Codespaces is also supported; verify the same command-line tools in the Codespace and use the documented callback workaround when a browser cannot reach `localhost` in the container.
 
 ## 1. Prepare Microsoft Fabric
 
@@ -38,11 +39,9 @@ Complete these steps in Microsoft Fabric:
 4. Select **Workspace settings** from the top right.
 5. Under **Workspace type**, ensure that **Fabric Trial** is selected and a trial capacity is assigned to the workspace. All lab artifacts will be deployed to this workspace.
 
-Record the workspace ID from the browser address bar. In a workspace URL, it is the GUID after `/groups/`.
-
 ## 2. Install developer tools
 
-Install the following software (if not using GH Codespaces):
+Install the following software on your laptop. In GitHub Codespaces, most tools are preinstalled, but you must still verify them and install Azure CLI if it is missing:
 
 - [Visual Studio Code](https://code.visualstudio.com/)
 - [Git](https://git-scm.com/downloads)
@@ -79,43 +78,44 @@ node --version
 npm --version
 ```
 
-Install Rayfin CLI version 1.34.0 globally, then verify the installation. The labs pin this version because later versions change the browser callback behavior used in GitHub Codespaces.
+Remove Rayfin CLI version 1.35.0 if it is installed, then install version 1.34.0 globally and verify the installation. The labs pin this version because version 1.35.0 changes the browser callback behavior used in GitHub Codespaces.
 
 ```bash
+npm uninstall --global @microsoft/rayfin-cli@1.35.0
 npm install --global @microsoft/rayfin-cli@1.34.0
 rayfin --version
 ```
 
 The version command should report `1.34.0`.
 
-Sign in to Rayfin using your Microsoft Entra tenant ID:
+On a laptop, authenticate Azure CLI against your Microsoft Entra tenant before running a lab:
+
+```bash
+az login -t <tenant-id>
+```
+
+Before running Rayfin CLI commands on either a laptop or in Codespaces, authenticate the pinned Rayfin CLI:
 
 ```bash
 rayfin login -t <tenant-id>
 ```
 
-If your environment cannot use the operating system credential store, enable encrypted file-based credential storage:
+If a generated template specifically instructs you to run `rayfin auth`, first confirm that its installed CLI exposes that command with `rayfin help`, then run:
 
 ```bash
-rayfin login -t <tenant-id> --encryption-fallback-enabled
+rayfin auth
 ```
 
-Keep the tenant ID and other environment-specific values out of source control.
+Complete each browser prompt with the same tenant account. In Codespaces, use `rayfin login -t <tenant-id> --encryption-fallback-enabled`; if the browser callback cannot reach `localhost`, copy the complete callback URL from the browser and run `curl "<copied-url>"` in a second Codespaces terminal. Keep the tenant ID and other environment-specific values out of source control.
 
 ## 5. Fork and open this workshop
 
-Using a GitHub Codespace created from your own fork is recommended. The fork gives you a repository where you can commit and push your lab work without needing write access to the workshop repository.
+Running the workshop from a laptop is recommended. Fork the repository first so you can commit and push your lab work without needing write access to the workshop repository.
 
 1. Sign in to GitHub and open the [rayfin-labs repository](https://github.com/ahmedbham/rayfin-labs).
 2. Select **Fork** in the top-right corner.
 3. Choose your GitHub account as the owner, keep the default repository name, and select **Create fork**.
-4. In your fork, select **Code**, then select the **Codespaces** tab.
-5. Select **Create codespace on main**.
-6. Wait for the Codespace to open in the browser-based VS Code editor.
-
-Your Codespace is connected to your fork, so you can commit and push changes as you complete the labs.
-
-For local development, clone your fork instead:
+4. Clone your fork to your laptop and open the repository root in VS Code:
 
 ```bash
 git clone https://github.com/<github-username>/rayfin-labs.git
@@ -123,7 +123,9 @@ cd rayfin-labs
 code .
 ```
 
-For local development, keep learner applications in sibling folders rather than generating them inside this documentation repository. In Codespaces, create learner applications in dedicated folders within your fork so that you can commit and push them.
+To use GitHub Codespaces instead, open your fork, select **Code** > **Codespaces** > **Create codespace on main**, and wait for the browser-based VS Code editor to open.
+
+For every lab, begin in this repository root. Run `rayfin init` here when the command creates the project folder, or create the lab's project folder here when the lab explicitly requires an empty directory. Do not create a sibling projects directory or leave the cloned repository before scaffolding.
 
 ## Troubleshooting
 

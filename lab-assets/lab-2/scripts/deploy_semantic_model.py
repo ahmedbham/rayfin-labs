@@ -118,7 +118,7 @@ def get_rayfin_auth_module() -> Path:
 
     raise RuntimeError(
         "Rayfin CLI was not found. Run this helper from a Rayfin project with "
-        "@microsoft/rayfin-cli installed, then run 'npx rayfin login'."
+        "@microsoft/rayfin-cli installed, then run 'rayfin login -t <tenant-id>'."
     )
 
 
@@ -150,13 +150,13 @@ def get_access_token(scopes: list[str] | None = None) -> str:
     except subprocess.CalledProcessError as error:
         detail = error.stderr.strip() or error.stdout.strip()
         raise RuntimeError(
-            f"Rayfin authentication failed: {detail}. Run 'npx rayfin login' and retry."
+            f"Rayfin authentication failed: {detail}. Run 'rayfin login -t <tenant-id>' and retry."
         ) from error
 
     token = result.stdout.strip()
     if not token:
         raise RuntimeError(
-            "Rayfin returned an empty Fabric access token. Run 'npx rayfin login' and retry."
+            "Rayfin returned an empty Fabric access token. Run 'rayfin login -t <tenant-id>' and retry."
         )
     return token
 
@@ -216,7 +216,7 @@ def request_json(
         except json.JSONDecodeError:
             detail = raw or error.reason
         auth_hint = (
-            " Run 'rayfin login -t <tenant-id> --encryption-fallback-enabled' and retry."
+            " Run 'rayfin login -t <tenant-id>' and retry."
             if error.code == 401
             else ""
         )

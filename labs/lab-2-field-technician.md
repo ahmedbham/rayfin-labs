@@ -21,7 +21,9 @@ In this lab, GitHub Copilot helps you turn business requirements into an impleme
 
 ## Before you begin
 
-Complete the [prerequisites]({% link prerequisites.md %}) and [Lab 1]({% link labs/lab-1-todo.md %}). Keep this workshop open in one VS Code window and create the learner app in a separate folder or window.
+Complete the [prerequisites]({% link prerequisites.md %}) and [Lab 1]({% link labs/lab-1-todo.md %}). Running the lab on a laptop is recommended, and GitHub Codespaces is also supported. Keep this workshop open while you work in the generated app folder inside the repository.
+
+From the repository root on a laptop, run `az login -t <tenant-id>` and then `rayfin login -t <tenant-id>`. In Codespaces, add `--encryption-fallback-enabled` to the Rayfin login and use the callback workaround from the prerequisites if the browser cannot reach `localhost`. If the generated template specifically requires `rayfin auth` and `rayfin help` lists it, run that command as well.
 
 Open these authoritative inputs before planning:
 
@@ -33,7 +35,7 @@ Copilot can accelerate implementation, but you own the schema and authorization 
 
 ## Exercise 1: Create a Rayfin project
 
-In a projects folder, scaffold a current Rayfin starter suitable for a data-driven React application:
+From this workshop repository root, scaffold a current Rayfin starter suitable for a data-driven React application. `rayfin init` creates the project folder; do not create or switch to another parent folder first.
 
 ```bash
 rayfin init

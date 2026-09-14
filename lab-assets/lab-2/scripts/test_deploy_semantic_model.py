@@ -60,7 +60,7 @@ class RayfinCliTests(unittest.TestCase):
             stderr="No cached account",
         )
 
-        with self.assertRaisesRegex(RuntimeError, "npx rayfin login"):
+        with self.assertRaisesRegex(RuntimeError, "rayfin login"):
             deploy_semantic_model.get_access_token()
 
     @mock.patch.object(deploy_semantic_model.subprocess, "run", side_effect=FileNotFoundError)
