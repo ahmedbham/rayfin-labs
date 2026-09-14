@@ -47,21 +47,18 @@ curl "<copied-url>"
 
 ### Exercise 1: Scaffold the application
 
-Open a terminal at the root of this cloned workshop repository. The command creates the `rayfin-todo-app` folder here; do not create or switch to another parent folder first.
+Open a terminal at the root of this cloned workshop repository. 
 
 ```bash
+mkdir rayfin-todo-app && cd rayfin-todo-app
 rayfin init --template https://github.com/microsoft/awesome-rayfin --template-name "[Experimental] Todo app with full local dev"
 ```
 
 When prompted, name the project `rayfin-todo-app`. Then open it in VS Code:
 
 ```bash
-cd rayfin-todo-app
-code .
 npm install
 ```
-
-If the scaffold command reports that the template name is unavailable, open the [current Todo template](https://github.com/microsoft/awesome-rayfin/tree/main/templates/todo-local-experimental), copy its displayed install command, and use the current name.
 
 ### Inspect the generated project
 

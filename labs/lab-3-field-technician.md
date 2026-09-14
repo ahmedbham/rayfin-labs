@@ -32,14 +32,12 @@ Open these authoritative inputs before planning:
 - [Lab 3 prompt](https://github.com/ahmedbham/rayfin-labs/blob/main/lab-assets/lab-3/LAB_3_PROMPT.md)
 - [Field technician functional requirements](https://github.com/ahmedbham/rayfin-labs/blob/main/lab-assets/lab-3/LAB_3_FUNCTIONAL_REQUIREMENTS.md)
 
-{: .important }
-Copilot can accelerate implementation, but you own the schema and authorization design. Never approve a plan that relies only on hidden UI controls to enforce dispatcher or technician permissions.
-
 ## Exercise 1: Create a Rayfin project
 
 From this workshop repository root, scaffold a current Rayfin starter suitable for a data-driven React application. `rayfin init` creates the project folder; do not create or switch to another parent folder first.
 
 ```bash
+mkdir field-technician-app && cd field-technician-app
 rayfin init
 ```
 
@@ -50,46 +48,15 @@ rayfin init
 ```bash
 cd field-technician-app
 npm install
-code .
 ```
-
-Copy `LAB_3_PROMPT.md` and `LAB_3_FUNCTIONAL_REQUIREMENTS.md` from this workshop into a temporary `requirements/` folder in the generated project. These files are design inputs; do not place them in the production frontend bundle.
-
-Inspect the scaffold's `AGENTS.md`, `.agents/skills/`, Rayfin configuration, data entities, package scripts, and existing tests. Current templates can differ, so these local instructions take precedence over assumed paths.
 
 ## Exercise 2: Generate the implementation plan
 
-Open Copilot Chat and select **Plan** mode. Attach both files from `requirements/`, then enter:
+Open Copilot Chat and select **Plan** mode. Attach folder `lab-asssets/lab-3/` folder, then enter:
 
-> Follow `LAB_3_PROMPT.md`. Analyze `LAB_3_FUNCTIONAL_REQUIREMENTS.md` and this scaffolded Rayfin project. Produce a detailed, ordered implementation plan. Do not edit files. Include a traceability matrix from requirement sections 3-12 to plan steps, identify authorization boundaries, state assumptions, and list focused validation after each implementation phase.
+> Follow `LAB_3_PROMPT.md`. 
 
 Save the proposed plan in the location offered by Copilot or in `IMPLEMENTATION_PLAN.md`.
-
-### Review rubric
-
-Do not switch modes until the plan covers all of the following:
-
-| Area | The plan must address |
-|:-----|:----------------------|
-| Identity | Profile setup, role selection, assigned regions, first-login routing, and clear setup failures. |
-| Data model | Profiles, regions and membership, customers, jobs, assignments, checklist items, equipment, notes/history, help requests, and image metadata. |
-| Authorization | Server-enforced authenticated access plus dispatcher/technician ownership and region rules. |
-| Dispatcher | Attention queues, customer search/create, job creation/assignment, job detail updates, and default region. |
-| Technician | Scheduled, unscheduled, and finished queues; status/on-site/checklist/equipment/note updates; help requests. |
-| Files | One image per new note, preview/removal, storage reference, camera fallback, and failed-save behavior. |
-| Reliability | Loading, empty, validation, success, not-found, and error states; manual and 30-second refresh. |
-| Delivery | Sample data, unit/component tests, representative browser workflows, lint, build, migration, and Fabric deployment. |
-
-Ask Copilot to revise omissions. Challenge these common weak assumptions:
-
-- A user-selected role is automatically trustworthy for authorization.
-- Region membership can be represented by a single string when requirements allow assignment to at least one region.
-- Photos can safely be stored as base64 text in the database or frontend.
-- Polling can start repeatedly without cancellation when routes change.
-- Sample data can depend on fixed user IDs that will not exist after deployment.
-
-{: .checkpoint }
-The approved plan maps every requirements section to implementation and validation steps, with explicit authorization policies and no unresolved blocking assumptions.
 
 ## Exercise 3: Implement the data foundation
 
