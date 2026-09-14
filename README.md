@@ -15,7 +15,7 @@ The published workshop uses Jekyll and the Just the Docs theme. Its three labs c
 
 Ruby 3.3 and Bundler are required for a local preview.
 
-```powershell
+```bash
 bundle install
 bundle exec jekyll serve
 ```
@@ -24,7 +24,7 @@ Open `http://localhost:4000/rayfin-labs/`.
 
 Alternatively, use Docker from the repository root:
 
-```powershell
+```bash
 docker run --rm -p 4000:4000 -v "${PWD}:/srv/jekyll" -w /srv/jekyll ruby:3.3-bookworm bash -lc "bundle install; bundle exec jekyll serve --host 0.0.0.0"
 ```
 

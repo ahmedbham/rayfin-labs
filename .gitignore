@@ -8,3 +8,5 @@ __pycache__/
 *.py[cod]
 .env
 .venv/
+/lab-1-todo/
+/my-lab2-dt-app/

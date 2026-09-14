@@ -19,8 +19,15 @@ from uuid import UUID
 
 
 FABRIC_API = "https://api.fabric.microsoft.com/v1"
-FABRIC_RESOURCE = "https://api.fabric.microsoft.com"
 DEFAULT_MODEL_DIR = Path(__file__).resolve().parents[1] / "Contoso-DT-Dashboard.SemanticModel"
+RAYFIN_AUTH_MODULE = Path("node_modules/@microsoft/rayfin-cli/dist/auth/index.js")
+RAYFIN_TOKEN_SCRIPT = """
+const { getRayfinAuth } = await import(process.argv[1]);
+const auth = await getRayfinAuth();
+const scopes = process.argv[2] ? JSON.parse(process.argv[2]) : undefined;
+const result = await auth.acquireToken(scopes, { silentOnly: true });
+process.stdout.write(result.token);
+"""
 
 
 def parse_args() -> argparse.Namespace:
@@ -93,47 +100,64 @@ def build_parts(model_dir: Path) -> list[dict[str, str]]:
     return parts
 
 
-def get_az_executable() -> str:
-    executable = shutil.which("az")
-    if not executable:
-        raise RuntimeError(
-            "Azure CLI was not found in PATH. Install it, fully restart VS Code, "
-            "and run 'az login'. Run 'az version' to verify the installation."
-        )
-    return executable
+def get_rayfin_auth_module() -> Path:
+    executable = shutil.which("rayfin")
+    if executable:
+        package_module = Path(executable).resolve().parents[1] / "dist" / "auth" / "index.js"
+        if package_module.is_file():
+            return package_module
+
+    search_roots = list(dict.fromkeys([Path.cwd(), *Path.cwd().parents, *Path(__file__).parents]))
+    for root in search_roots:
+        candidate = root / RAYFIN_AUTH_MODULE
+        if candidate.is_file():
+            return candidate
+        for child_candidate in root.glob(f"*/{RAYFIN_AUTH_MODULE}"):
+            if child_candidate.is_file():
+                return child_candidate
+
+    raise RuntimeError(
+        "Rayfin CLI was not found. Run this helper from a Rayfin project with "
+        "@microsoft/rayfin-cli installed, then run 'npx rayfin login'."
+    )
 
 
-def get_access_token() -> str:
-    executable = get_az_executable()
+def get_access_token(scopes: list[str] | None = None) -> str:
+    node = shutil.which("node")
+    if not node:
+        raise RuntimeError("Node.js was not found in PATH; it is required to use Rayfin authentication.")
+    auth_module = get_rayfin_auth_module()
     try:
+        command = [
+            node,
+            "--input-type=module",
+            "--eval",
+            RAYFIN_TOKEN_SCRIPT,
+            auth_module.resolve().as_uri(),
+        ]
+        if scopes:
+            command.append(json.dumps(scopes))
         result = subprocess.run(
-            [
-                executable,
-                "account",
-                "get-access-token",
-                "--resource",
-                FABRIC_RESOURCE,
-                "--query",
-                "accessToken",
-                "--output",
-                "tsv",
-            ],
+            command,
             check=True,
             capture_output=True,
             text=True,
         )
     except FileNotFoundError as error:
         raise RuntimeError(
-            "Azure CLI was resolved in PATH but could not be launched. "
-            "Run 'az version' to verify the installation, then fully restart VS Code."
+            "Node.js or the Rayfin CLI authentication module could not be launched."
         ) from error
     except subprocess.CalledProcessError as error:
         detail = error.stderr.strip() or error.stdout.strip()
-        raise RuntimeError(f"Azure CLI authentication failed: {detail}") from error
+        raise RuntimeError(
+            f"Rayfin authentication failed: {detail}. Run 'npx rayfin login' and retry."
+        ) from error
 
     token = result.stdout.strip()
     if not token:
-        raise RuntimeError("Azure CLI returned an empty Fabric access token. Run 'az login'.")
+        raise RuntimeError(
+            "Rayfin returned an empty Fabric access token. Run 'npx rayfin login' and retry."
+        )
     return token
 
 
@@ -190,8 +214,15 @@ def request_json(
         try:
             detail = json.loads(raw)
         except json.JSONDecodeError:
-            detail = raw
-        raise RuntimeError(f"Fabric API returned HTTP {error.code}: {detail}") from error
+            detail = raw or error.reason
+        auth_hint = (
+            " Run 'rayfin login -t <tenant-id> --encryption-fallback-enabled' and retry."
+            if error.code == 401
+            else ""
+        )
+        raise RuntimeError(
+            f"API request to {url} returned HTTP {error.code}: {detail}.{auth_hint}"
+        ) from error
     except URLError as error:
         raise RuntimeError(f"Could not reach the Fabric API: {error.reason}") from error
 

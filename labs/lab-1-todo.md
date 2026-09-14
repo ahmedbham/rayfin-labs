@@ -36,7 +36,7 @@ After creating a GitHub Codespace from your fork, use this path to scaffold and 
 2. Open a terminal in the Codespace and scaffold the app:
 
 	```bash
-	npm create @microsoft/rayfin@latest -- --template https://github.com/microsoft/awesome-rayfin --template-name "[Experimental] Todo app with full local dev"
+	rayfin init --template https://github.com/microsoft/awesome-rayfin --template-name "[Experimental] Todo app with full local dev"
 	```
 
 3. When prompted, name the project `rayfin-todo-app`. Then install dependencies and build it:
@@ -51,7 +51,7 @@ After creating a GitHub Codespace from your fork, use this path to scaffold and 
 
 	```bash
 	RAYFIN_TENANT_ID=<tenant-guid>
-	npx rayfin login -t $RAYFIN_TENANT_ID --encryption-fallback-enabled
+	rayfin login -t $RAYFIN_TENANT_ID --encryption-fallback-enabled
 	```
 
 5. Complete sign-in in the browser. If the browser opens a page showing **Hmmm... can't reach this page**:
@@ -73,15 +73,15 @@ After creating a GitHub Codespace from your fork, use this path to scaffold and 
 
 ### Exercise 1: Scaffold the application
 
-Open PowerShell in a folder where you keep projects. Do not generate the application inside the cloned workshop repository.
+Open bash in a folder where you keep projects. Do not generate the application inside the cloned workshop repository.
 
-```powershell
-npm create @microsoft/rayfin@latest -- --template https://github.com/microsoft/awesome-rayfin --template-name "[Experimental] Todo app with full local dev"
+```bash
+rayfin init --template https://github.com/microsoft/awesome-rayfin --template-name "[Experimental] Todo app with full local dev"
 ```
 
 When prompted, name the project `rayfin-todo-app`. Then open it in VS Code:
 
-```powershell
+```bash
 cd rayfin-todo-app
 code .
 npm install
@@ -111,13 +111,13 @@ You can explain which file defines storage and authorization, and which file cal
 
 Start Docker Desktop and verify the engine:
 
-```powershell
+```bash
 docker info
 ```
 
 In the VS Code terminal, start the backend containers and Vite:
 
-```powershell
+```bash
 npm run dev:local
 ```
 
@@ -125,7 +125,7 @@ Keep that terminal running. The public Rayfin webservice image is pulled automat
 
 Open a second terminal and apply the database migration:
 
-```powershell
+```bash
 npm run rayfin:db
 ```
 
@@ -156,7 +156,7 @@ Compare its answer with the files you inspected. Treat Copilot's explanation as 
 
 Run the checks exposed by the template:
 
-```powershell
+```bash
 npm run lint
 npm run test
 npm run build
@@ -166,7 +166,7 @@ Fix issues introduced by your UI change. Do not disable a lint rule or remove a 
 
 To inspect local service status or reset the environment, use:
 
-```powershell
+```bash
 npm run rayfin:dev -- status
 npm run dev:local:stop
 npm run dev:local:down
@@ -181,13 +181,13 @@ Lint, tests, and the production build complete successfully.
 
 Stop the local development command. Sign in when the Rayfin CLI prompts you, then run:
 
-```powershell
+```bash
 npm run up
 ```
 
 Select the capacity-backed workspace prepared earlier. If the generated template exposes `npm run dev` as its cloud-connected development command, you can use it to deploy services and run Vite locally against the Fabric backend:
 
-```powershell
+```bash
 npm run dev
 ```
 
@@ -218,7 +218,7 @@ The deployed URL loads with Fabric SSO, Todo operations succeed, and the generat
 
 Stop local services without deleting data:
 
-```powershell
+```bash
 npm run dev:local:stop
 ```
 

@@ -1,75 +1,87 @@
 import subprocess
 import unittest
+from io import BytesIO
+from pathlib import Path
 from unittest import mock
+from urllib.error import HTTPError
 
 from scripts import deploy_semantic_model
 
 
-class AzureCliTests(unittest.TestCase):
-    @mock.patch.object(deploy_semantic_model.shutil, "which")
-    def test_get_az_executable_returns_resolved_path(self, which: mock.Mock) -> None:
-        which.return_value = r"C:\Program Files\Azure CLI\az.CMD"
+class ModelDefinitionTests(unittest.TestCase):
+    def test_every_table_partition_is_marked_as_a_table_result(self) -> None:
+        tables_dir = deploy_semantic_model.DEFAULT_MODEL_DIR / "definition" / "tables"
 
-        executable = deploy_semantic_model.get_az_executable()
+        for table_path in tables_dir.glob("*.tmdl"):
+            with self.subTest(table=table_path.name):
+                definition = table_path.read_text()
+                self.assertIn("annotation PBI_NavigationStepName = Navigation", definition)
+                self.assertIn("annotation PBI_ResultType = Table", definition)
 
-        self.assertEqual(executable, r"C:\Program Files\Azure CLI\az.CMD")
-        which.assert_called_once_with("az")
 
-    @mock.patch.object(deploy_semantic_model.shutil, "which", return_value=None)
-    def test_get_az_executable_reports_missing_cli(self, _which: mock.Mock) -> None:
-        with self.assertRaisesRegex(RuntimeError, "fully restart VS Code"):
-            deploy_semantic_model.get_az_executable()
-
+class RayfinCliTests(unittest.TestCase):
     @mock.patch.object(deploy_semantic_model.subprocess, "run")
-    @mock.patch.object(deploy_semantic_model, "get_az_executable")
-    def test_get_access_token_uses_resolved_path_and_trims_token(
+    @mock.patch.object(deploy_semantic_model, "get_rayfin_auth_module")
+    @mock.patch.object(deploy_semantic_model.shutil, "which", return_value="/usr/bin/node")
+    def test_get_access_token_uses_rayfin_auth_and_trims_token(
         self,
-        get_executable: mock.Mock,
+        _which: mock.Mock,
+        get_auth_module: mock.Mock,
         run: mock.Mock,
     ) -> None:
-        get_executable.return_value = r"C:\Program Files\Azure CLI\az.CMD"
+        get_auth_module.return_value = Path("/project/node_modules/@microsoft/rayfin-cli/dist/auth/index.js")
         run.return_value = subprocess.CompletedProcess([], 0, stdout=" token-value\n", stderr="")
 
         token = deploy_semantic_model.get_access_token()
 
         self.assertEqual(token, "token-value")
         command = run.call_args.args[0]
-        self.assertEqual(command[0], get_executable.return_value)
-        self.assertEqual(command[1:4], ["account", "get-access-token", "--resource"])
-        self.assertEqual(command[4], deploy_semantic_model.FABRIC_RESOURCE)
+        self.assertEqual(command[0], "/usr/bin/node")
+        self.assertEqual(command[1:3], ["--input-type=module", "--eval"])
+        self.assertIn("silentOnly: true", command[3])
+        self.assertEqual(
+            command[4],
+            "file:///project/node_modules/%40microsoft/rayfin-cli/dist/auth/index.js",
+        )
         self.assertFalse(run.call_args.kwargs.get("shell", False))
 
     @mock.patch.object(deploy_semantic_model.subprocess, "run")
-    @mock.patch.object(deploy_semantic_model, "get_az_executable", return_value="az.CMD")
+    @mock.patch.object(deploy_semantic_model, "get_rayfin_auth_module", return_value=Path("auth.js"))
+    @mock.patch.object(deploy_semantic_model.shutil, "which", return_value="node")
     def test_get_access_token_reports_authentication_failure(
         self,
-        _get_executable: mock.Mock,
+        _which: mock.Mock,
+        _get_auth_module: mock.Mock,
         run: mock.Mock,
     ) -> None:
         run.side_effect = subprocess.CalledProcessError(
             1,
-            ["az.CMD"],
-            stderr="Please run az login",
+            ["node"],
+            stderr="No cached account",
         )
 
-        with self.assertRaisesRegex(RuntimeError, "Please run az login"):
+        with self.assertRaisesRegex(RuntimeError, "npx rayfin login"):
             deploy_semantic_model.get_access_token()
 
     @mock.patch.object(deploy_semantic_model.subprocess, "run", side_effect=FileNotFoundError)
-    @mock.patch.object(deploy_semantic_model, "get_az_executable", return_value="az.CMD")
+    @mock.patch.object(deploy_semantic_model, "get_rayfin_auth_module", return_value=Path("auth.js"))
+    @mock.patch.object(deploy_semantic_model.shutil, "which", return_value="node")
     def test_get_access_token_reports_launch_failure(
         self,
-        _get_executable: mock.Mock,
+        _which: mock.Mock,
+        _get_auth_module: mock.Mock,
         _run: mock.Mock,
     ) -> None:
         with self.assertRaisesRegex(RuntimeError, "could not be launched"):
             deploy_semantic_model.get_access_token()
 
     @mock.patch.object(deploy_semantic_model.subprocess, "run")
-    @mock.patch.object(deploy_semantic_model, "get_az_executable", return_value="az.CMD")
+    @mock.patch.object(deploy_semantic_model, "get_rayfin_auth_module", return_value=Path("auth.js"))
+    @mock.patch.object(deploy_semantic_model.shutil, "which", return_value="node")
     def test_get_access_token_rejects_empty_token(
         self,
-        _get_executable: mock.Mock,
+        _which: mock.Mock,
+        _get_auth_module: mock.Mock,
         run: mock.Mock,
     ) -> None:
         run.return_value = subprocess.CompletedProcess([], 0, stdout="  \n", stderr="")
@@ -79,6 +91,28 @@ class AzureCliTests(unittest.TestCase):
 
 
 class FabricApiTests(unittest.TestCase):
+    @mock.patch.object(deploy_semantic_model, "urlopen")
+    def test_request_json_explains_empty_unauthorized_response(self, urlopen: mock.Mock) -> None:
+        error = HTTPError(
+            "https://api.fabric.microsoft.com/v1/test",
+            401,
+            "Unauthorized",
+            {},
+            BytesIO(b""),
+        )
+        self.addCleanup(error.close)
+        urlopen.side_effect = error
+
+        with self.assertRaisesRegex(
+            RuntimeError,
+            r"/v1/test returned HTTP 401: Unauthorized.*rayfin login",
+        ):
+            deploy_semantic_model.request_json(
+                "GET",
+                "https://api.fabric.microsoft.com/v1/test",
+                "token-value",
+            )
+
     @mock.patch.object(deploy_semantic_model, "request_json")
     def test_resolve_workspace_id_accepts_and_normalizes_guid(
         self,

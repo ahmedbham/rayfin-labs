@@ -23,7 +23,7 @@ In this lab, you deploy the bundled Contoso semantic model and use GitHub Copilo
 
 ## Before you begin
 
-Complete the [prerequisites]({% link prerequisites.md %}) and [Lab 1]({% link labs/lab-1-todo.md %}). Lab 2 requires Azure CLI authentication, Python 3.11 or later, Node.js and npm, a capacity-backed Fabric workspace, and Playwright.
+Complete the [prerequisites]({% link prerequisites.md %}) and [Lab 1]({% link labs/lab-1-todo.md %}). Lab 2 requires an authenticated Rayfin CLI, Python 3.11 or later, Node.js and npm, a capacity-backed Fabric workspace, and Playwright.
 
 Open these workshop assets:
 
@@ -34,31 +34,54 @@ Open these workshop assets:
 
 ## Exercise 1: Deploy the semantic model
 
-From this workshop repository, validate the model package without connecting to Fabric:
+- change directory to the workshop repository where the semantic model and deployment helper are located.
 
-```powershell
+```bash
+cd "lab-assets/lab-2"
+```
+
+- Validate the model package without connecting to Fabric.
+
+```bash
 python scripts/deploy_semantic_model.py --dry-run
 ```
 
 The command should list 10 parts: `definition.pbism`, database/model/relationship definitions, and six table definitions.
 
-Sign in and deploy the model. Replace the placeholder with the workspace GUID or exact display name recorded during setup:
+- Set your Microsoft Entra tenant ID and sign in to Rayfin:
 
-```powershell
-az login
-python scripts/deploy_semantic_model.py --workspace-id <workspace-id-or-name>
-```
+	```bash
+	RAYFIN_TENANT_ID=<tenant-guid>
+	rayfin login -t $RAYFIN_TENANT_ID --encryption-fallback-enabled
+	```
 
-The helper verifies capacity assignment, obtains a Fabric-scoped access token from Azure CLI, packages each TMDL file as inline base64, polls asynchronous operations, and prints the semantic model ID. It does not persist the token.
+- Complete sign-in in the browser. If the browser opens a page showing **Hmmm... can't reach this page**:
+	- Copy the complete URL from the page. It starts with `localhost:`.
+	- Open a new terminal in the Codespace.
+	- Run the callback URL through `curl`:
+
+	  ```bash
+	  curl "<copied-url>"
+	  ```
+
+- Return to the original terminal and deploy the app to Fabric:
+
+	```bash
+	python scripts/deploy_semantic_model.py --workspace-id <workspace-id-or-name>
+	```
+
+The helper verifies capacity assignment, obtains a Fabric-scoped access token from Rayfin's login cache, packages each TMDL file as inline base64, polls asynchronous definition operations, and prints the semantic model ID. It does not persist the token.
 
 If a model named **Contoso DT Dashboard** already exists and you intentionally want to replace its complete definition, use:
 
-```powershell
+```bash
 python scripts/deploy_semantic_model.py --workspace-id <workspace-id-or-name> --update-existing
 ```
 
 {: .warning }
 `--update-existing` replaces the complete semantic-model definition. Use it only for the model created by this lab and never against an unrelated production model.
+
+After deployment, open the semantic model in Fabric and select **Refresh now**. Wait for the refresh history to report **Completed** before previewing a table. The Fabric REST API does not currently expose a refresh job for semantic model items.
 
 Open the model in the Fabric workspace and confirm these tables:
 
@@ -86,117 +109,36 @@ The model appears in the target workspace, all six tables are present, and you h
 
 ## Exercise 2: Create the Fabric data app
 
-Follow the current Microsoft Learn instructions in [Create an app connected to a semantic model](https://learn.microsoft.com/en-us/fabric/apps/data-apps-template?source=recommendations). From the parent folder where you keep projects, run:
+Follow the current Microsoft Learn instructions in [Create an app connected to a semantic model](https://learn.microsoft.com/en-us/fabric/apps/data-apps-template?source=recommendations). From the parent folder where you keep projects (for example, `cd "$GITHUB_WORKSPACE"` in Codepace), run
 
-```powershell
-npm create @microsoft/rayfin@latest -- "<appitemname>" --template dataapp --workspace <workspacename>
+```bash
+rayfin init "<appitemname>" --template dataapp --workspace <workspacename>
 ```
 
 Replace `<appitemname>` with a unique Fabric App item name, such as `contoso-dt-dashboard-app`, and replace `<workspacename>` with the exact display name of the workspace containing the semantic model. Keep the quotation marks around the app item name when it contains spaces.
 
-When the command finishes, change to the generated app directory and open it in Visual Studio Code:
+When the command finishes, change to the generated app directory
 
-```powershell
+```bash
 cd "<appitemname>"
-code .
 ```
-
-{: .checkpoint }
-The generated data app project is open in Visual Studio Code and the Fabric App item appears in the target workspace.
 
 ## Exercise 3: Build with GitHub Copilot
 
-In Visual Studio Code, open GitHub Copilot Chat and select **Agent** mode. Paste the following prompt, replacing the example semantic model URL with the complete URL you stored in Exercise 1:
+Open GitHub Copilot Chat and select **Agent** mode. Paste the following prompt, replacing the example semantic model URL with the complete URL you stored in Exercise 1:
 
 ```text
-Build a [Microsoft Fabric App](https://learn.microsoft.com/fabric/apps/overview) using [Rayfin CLI](https://github.com/microsoft/rayfin) as an interactive, cross-filterable interface to the Power BI semantic model at https://msit.powerbi.com/groups/workspace-id/modeling/model-id/modelView
-
-Before writing code, inspect the semantic model's tables, measures, columns, and relationships and produce an implementation plan that maps every proposed visual to real model fields or measures. Include KPI summaries and analytical views for operational metrics, investment, initiatives, asset visibility, and AI detections.
+Update Fabric app **my-lab2-dt-app** as an interactive, cross-filterable interface to the Power BI semantic model at "https://msit.powerbi.com/groups/workspace-id/modeling/model-id/modelView". For reference, **dt-dashboard-report-image.png** is a screenshot of a Power Bi report on this semantic model.   
 ```
 
-Copilot can use the model URL to identify the workspace and semantic model. Let Agent mode inspect the generated template and model metadata, then review its plan before approving implementation.
+Copilot can use the model URL to identify the workspace and semantic model. 
 
-### Review rubric
-
-Approve the plan only when it includes:
-
-| Area | Expected coverage |
-|:-----|:------------------|
-| Executive summary | Latest availability, MTTR, incidents, change success, security, and service KPIs using existing measures. |
-| Trends | Date-aware incident, disruption, MTTR, change, or security trends that respect the selected period. |
-| Portfolio | Investment by business unit/theme and initiatives by status/off-track state. |
-| Risk and AI | Asset visibility by severity and AI detections by system/severity. |
-| Query mapping | Each visual names real tables, columns, measures, grouping, sorting, and filter inputs. |
-| Interactions | Date, business unit, theme, status, severity, and system selections update only compatible visuals; reset restores defaults. |
-| State model | Initial loading, per-query failure, empty result, partial data, retry, stale request cancellation, and no-selection behavior. |
-| Quality | Keyboard operation, focus indication, text alternatives, color-independent status, responsive layout, tests, and Playwright checks. |
-
-Avoid a plan that loads the full dataset into the browser or simulates filtering only on already-rendered values. Preserve the data app template's semantic-model query abstraction and issue appropriately filtered and aggregated queries.
-
-{: .checkpoint }
-Every visual maps to real model metadata, and the approved plan defines shared filters, compatible interactions, query behavior, and executable tests.
-
-## Exercise 4: Implement and validate locally
-
-Ask Copilot Agent to implement the approved plan. Keep the data app template's Fabric authentication, semantic-model connectivity, visualization primitives, formatting, and query patterns intact. Do not invent model fields, hard-code credentials, or load the full dataset into the browser.
-
-Use this implementation order:
-
-1. Runtime configuration and semantic-model client wiring.
-2. Typed query definitions and result transformations.
-3. Shared filter state, compatibility rules, reset, and stale-request cancellation.
-4. KPI and trend views.
-5. Investment, initiative, asset visibility, and AI detection views.
-6. Loading, empty, partial-error, retry, and no-selection states.
-7. Keyboard/accessibility behavior and responsive layout.
-8. Automated tests and Playwright browser scenarios.
-
-After each phase, have Copilot run the narrowest available validation. Measure names containing spaces or punctuation must be referenced exactly as exposed by the semantic model.
-
-Run the generated project's lint, test, and production build commands. Use the scripts defined in its `package.json`; these are typically:
-
-```powershell
-npm run lint
-npm run test
-npm run build
-```
-
-Ask Copilot to use the template's Playwright browser-validation workflow to check initial rendering, cross-filtering, reset behavior, errors, and desktop/mobile layout. Inspect the screenshots rather than treating a successful element lookup as visual proof.
-
-## Exercise 5: Preview in the Fabric shell
-
-Start the local frontend using the command documented by the generated template, typically:
-
-```powershell
-npm run dev
-```
-
-Navigate to the target workspace in the Fabric portal and open the Fabric App artifact created for local development. Append the development URI to its browser URL:
-
-```text
-&devUri=http://localhost:5173
-```
-
-Use the exact URL printed by Vite if it selects another port. The Fabric shell supplies the brokered context expected by the starter.
-
-Validate these interactions manually:
-
-1. Select a date period and confirm related metrics and AI detections update.
-2. Select an investment business unit and confirm compatible portfolio visuals update without incorrectly filtering unrelated metric tables.
-3. Select severity in asset or AI views and confirm compatible risk visuals respond.
-4. Combine two compatible filters and verify visible filter context is clear.
-5. Reset filters and confirm the default dashboard returns.
-6. Force or simulate one query failure and confirm other successful sections remain useful.
-
-{: .checkpoint }
-Lint, unit/component tests, production build, and browser checks pass; desktop and mobile screenshots show a usable, nonblank dashboard.
-
-## Exercise 6: Deploy and verify the Fabric App
+## Exercise 4: Deploy and verify the Fabric App
 
 From the generated app directory, deploy the app to Fabric with Rayfin:
 
-```powershell
-npx rayfin up
+```bash
+rayfin up
 ```
 
 Wait for the command to complete successfully. In the Fabric portal, open the target workspace, select the Fabric App item created in Exercise 2, and verify that the latest build is available inside the Fabric portal.
@@ -206,11 +148,6 @@ After deployment:
 1. Open the app inside the Fabric portal and verify that it renders without a separate sign-in prompt.
 2. Confirm the deployed app queries the intended semantic model ID.
 3. Repeat one cross-filter and reset scenario.
-4. Test with a user who has **Run and interact** on the app and **Build** permission on the semantic model.
-5. Confirm no token or credential appears in source, generated JavaScript, browser storage, or network query parameters.
-
-{: .note }
-Semantic-model-connected Fabric Apps currently must run inside the Fabric portal. Opening the app in a standalone browser window can cause visual queries to fail.
 
 {: .checkpoint }
 The Rayfin deployment succeeds, the latest app build opens in the Fabric portal, live semantic-model data renders, and cross-filter and reset interactions work.
@@ -219,8 +156,9 @@ The Rayfin deployment succeeds, the latest app build opens in the Fabric portal,
 
 | Symptom | Resolution |
 |:--------|:-----------|
-| Helper returns `401` | Run `az login` again. The helper requests the `https://api.fabric.microsoft.com` audience. |
+| Helper returns `401` | Run `rayfin login -t <tenant-id> --encryption-fallback-enabled` again. The helper requests Rayfin's default Fabric scope. |
 | Helper returns `403` | Stop and obtain Contributor or higher workspace access. |
+| Tables contain no data after deployment | Select **Refresh now** for the semantic model and wait for refresh history to report **Completed**. |
 | Helper reports no capacity | Assign the workspace to a supported Fabric capacity before retrying. |
 | Rayfin cannot create the app item | Confirm the Fabric Apps workload is enabled and that you are a workspace Contributor or Admin. |
 | Visual queries return permission errors | Confirm the Semantic Model Execute Queries REST API tenant setting is enabled and the user has Build and Read permissions on the model. |

@@ -19,6 +19,7 @@ Fabric Apps is a preview workload and is not available in every region.
 | GitHub Codespaces | Recommended | Recommended | Recommended |
 | VS Code and GitHub Copilot Chat | Required | Required | Required |
 | Git and Node.js 22 | Required | Required | Required |
+| Rayfin CLI (`@microsoft/rayfin-cli`) | Required | Required if prompted by the lab | Required |
 | Docker Desktop | Required for local Rayfin | Not required by the analytics template | Required for local Rayfin |
 | Capacity-backed Fabric workspace | Required for deployment | Required | Required for deployment |
 | Azure CLI | Recommended | Required | Recommended |
@@ -52,7 +53,7 @@ Install the following software (if not using GH Codespaces):
 
 Restart the terminal after installing software, then verify it:
 
-```powershell
+```bash
 git --version
 node --version
 npm --version
@@ -69,7 +70,39 @@ Node should report version 22. Start Docker Desktop and wait until the engine re
 2. Install the **GitHub Copilot** and **GitHub Copilot Chat** extensions in VS Code.
 3. Sign in to GitHub from VS Code.
 
-## 4. Fork and open this workshop
+## 4. Install the Rayfin CLI
+
+The Rayfin CLI is distributed as the `@microsoft/rayfin-cli` npm package. Verify that Node.js 22 and npm are available:
+
+```bash
+node --version
+npm --version
+```
+
+Install Rayfin CLI version 1.34.0 globally, then verify the installation. The labs pin this version because later versions change the browser callback behavior used in GitHub Codespaces.
+
+```bash
+npm install --global @microsoft/rayfin-cli@1.34.0
+rayfin --version
+```
+
+The version command should report `1.34.0`.
+
+Sign in to Rayfin using your Microsoft Entra tenant ID:
+
+```bash
+rayfin login -t <tenant-id>
+```
+
+If your environment cannot use the operating system credential store, enable encrypted file-based credential storage:
+
+```bash
+rayfin login -t <tenant-id> --encryption-fallback-enabled
+```
+
+Keep the tenant ID and other environment-specific values out of source control.
+
+## 5. Fork and open this workshop
 
 Using a GitHub Codespace created from your own fork is recommended. The fork gives you a repository where you can commit and push your lab work without needing write access to the workshop repository.
 
@@ -84,7 +117,7 @@ Your Codespace is connected to your fork, so you can commit and push changes as 
 
 For local development, clone your fork instead:
 
-```powershell
+```bash
 git clone https://github.com/<github-username>/rayfin-labs.git
 cd rayfin-labs
 code .
@@ -98,8 +131,8 @@ For local development, keep learner applications in sibling folders rather than 
 |:--------|:-----------|
 | Fabric Apps does not appear | Confirm the tenant setting, security-group scope, capacity assignment, and supported region. Allow several minutes for a tenant-setting change to propagate. |
 | `docker info` cannot connect | Start Docker Desktop and switch to Linux containers. |
-| PowerShell cannot find a newly installed command | Close and reopen VS Code so its terminal receives the updated `PATH`. |
-| PowerShell finds `az`, but the Python deployment helper does not | Run `python -c "import shutil; print(shutil.which('az'))"`. On Windows, it should print the full path to `az.CMD`; if it prints `None`, fully close and reopen VS Code so Python receives the updated `PATH` and `PATHEXT`. |
+| bash cannot find a newly installed command | Close and reopen VS Code so its terminal receives the updated `PATH`. |
+| bash finds `az`, but the Python deployment helper does not | Run `python -c "import shutil; print(shutil.which('az'))"`. On Windows, it should print the full path to `az.CMD`; if it prints `None`, fully close and reopen VS Code so Python receives the updated `PATH` and `PATHEXT`. |
 | Fabric API returns `401` | Sign in again and request a token for `https://api.fabric.microsoft.com`, not the Power BI API audience. |
 | Fabric API returns `403` | Ask for Contributor or higher access to the target workspace. Do not repeatedly retry. |
 

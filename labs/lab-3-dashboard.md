@@ -34,7 +34,7 @@ Open these workshop assets:
 
 From this workshop repository, validate the model package without connecting to Fabric:
 
-```powershell
+```bash
 python scripts/deploy_semantic_model.py --dry-run
 ```
 
@@ -42,7 +42,7 @@ The command should list 10 parts: `definition.pbism`, database/model/relationshi
 
 Sign in and deploy the model. Replace the placeholder with the workspace GUID or exact display name recorded during setup:
 
-```powershell
+```bash
 az login
 python scripts/deploy_semantic_model.py --workspace-id <workspace-id-or-name>
 ```
@@ -51,7 +51,7 @@ The helper verifies capacity assignment, obtains a Fabric-scoped access token fr
 
 If a model named **Contoso DT Dashboard** already exists and you intentionally want to replace its complete definition, use:
 
-```powershell
+```bash
 python scripts/deploy_semantic_model.py --workspace-id <workspace-id-or-name> --update-existing
 ```
 
@@ -86,15 +86,15 @@ The model appears in the target workspace, all six tables are present, and you h
 
 Follow the current Microsoft Learn instructions in [Create an app connected to a semantic model](https://learn.microsoft.com/en-us/fabric/apps/data-apps-template?source=recommendations). From the parent folder where you keep projects, run:
 
-```powershell
-npm create @microsoft/rayfin@latest -- "<appitemname>" --template dataapp --workspace <workspacename>
+```bash
+rayfin init "<appitemname>" --template dataapp --workspace <workspacename>
 ```
 
 Replace `<appitemname>` with a unique Fabric App item name, such as `contoso-dt-dashboard-app`, and replace `<workspacename>` with the exact display name of the workspace containing the semantic model. Keep the quotation marks around the app item name when it contains spaces.
 
 When the command finishes, change to the generated app directory and open it in Visual Studio Code:
 
-```powershell
+```bash
 cd "<appitemname>"
 code .
 ```
@@ -153,7 +153,7 @@ After each phase, have Copilot run the narrowest available validation. Measure n
 
 Run the generated project's lint, test, and production build commands. Use the scripts defined in its `package.json`; these are typically:
 
-```powershell
+```bash
 npm run lint
 npm run test
 npm run build
@@ -165,7 +165,7 @@ Ask Copilot to use the template's Playwright browser-validation workflow to chec
 
 Start the local frontend using the command documented by the generated template, typically:
 
-```powershell
+```bash
 npm run dev
 ```
 
@@ -193,8 +193,8 @@ Lint, unit/component tests, production build, and browser checks pass; desktop a
 
 From the generated app directory, deploy the app to Fabric with Rayfin:
 
-```powershell
-npx rayfin up
+```bash
+rayfin up
 ```
 
 Wait for the command to complete successfully. In the Fabric portal, open the target workspace, select the Fabric App item created in Exercise 2, and verify that the latest build is available inside the Fabric portal.
